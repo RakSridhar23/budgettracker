@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import confetti from 'canvas-confetti';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { 
   Plus, 
   Wallet, 
@@ -17,7 +19,9 @@ import {
   Calendar,
   Repeat,
   Download,
-  Pencil
+  Pencil,
+  Mail,
+  Loader
 } from 'lucide-react';
 import { TEMPLATES, COLORS, CURRENCIES } from './constants';
 import { AppState, Category, Transaction, RecurrenceFrequency } from './types';
@@ -50,6 +54,11 @@ const App: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  
+  // Email Report State
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [emailAddress, setEmailAddress] = useState('');
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   // Transaction Form State
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -166,16 +175,24 @@ const App: React.FC = () => {
 
   // --- AI Advice Effect ---
   useEffect(() => {
-    if (state.hasOnboarded && !isLoadingAdvice) {
+    if (state.hasOnboarded) {
       setIsLoadingAdvice(true);
-      // We rely on the current view's transactions for context-aware advice
-      getFinancialAdvice(state.monthlyIncome, currentMonthTransactions, state.categories, state.currency)
-        .then(advice => {
-          setAiAdvice(advice);
-          setIsLoadingAdvice(false);
-        });
+      // Debounce the advice generation to avoid excessive API calls
+      const timer = setTimeout(() => {
+        getFinancialAdvice(state.monthlyIncome, currentMonthTransactions, state.categories, state.currency)
+          .then(advice => {
+            setAiAdvice(advice);
+            setIsLoadingAdvice(false);
+          })
+          .catch(err => {
+             console.error(err);
+             setIsLoadingAdvice(false);
+          });
+      }, 1000); // 1 second debounce
+
+      return () => clearTimeout(timer);
     }
-  }, [state.hasOnboarded, currentDate.getMonth()]); // Refresh advice when month changes
+  }, [state.hasOnboarded, currentMonthTransactions, state.monthlyIncome, state.categories, state.currency]);
 
   // --- Handlers ---
 
@@ -280,19 +297,10 @@ const App: React.FC = () => {
 
     setIsAddModalOpen(false);
     resetForm();
-    
-    // Refresh advice
-    setTimeout(() => {
-       getFinancialAdvice(state.monthlyIncome, [...currentMonthTransactions], state.categories, state.currency)
-        .then(setAiAdvice);
-    }, 1000);
   };
 
   const handleEditClick = (t: Transaction) => {
-    // We must find the master transaction from state, because 't' might be a projected one
-    // with a modified date. We want to edit the Source of Truth.
     const master = state.transactions.find(tr => tr.id === t.id) || t;
-    
     setEditingId(master.id);
     setAmount(master.amount.toString());
     setDescription(master.description);
@@ -300,7 +308,6 @@ const App: React.FC = () => {
     setTxType(master.type);
     setIsRecurring(!!master.isRecurring);
     setRecurrenceFreq(master.recurrence || 'monthly');
-    
     setIsAddModalOpen(true);
   };
 
@@ -349,24 +356,124 @@ const App: React.FC = () => {
     }
   };
 
-  const generateEmailReport = () => {
+  const handleSendReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailAddress) return;
+
+    setIsSendingEmail(true);
+
+    // Simulate Network Delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Generate PDF
+    const doc = new jsPDF();
     const monthStr = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-    const body = `
-      Budget Report for ${monthStr}
-      
-      Income: ${state.currency}${totalIncome}
-      Expenses: ${state.currency}${totalExpenses}
-      Net: ${state.currency}${remainingBudget}
-      
-      Top Categories:
-      ${state.categories.map(c => {
-        const amt = currentMonthTransactions
-            .filter(t => t.categoryId === c.id)
+    
+    // --- Header ---
+    doc.setFontSize(22);
+    doc.setTextColor(33, 33, 33);
+    doc.text(`ZenBudget Report`, 14, 20);
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text(`For: ${monthStr}`, 14, 28);
+    doc.text(`Prepared for: ${emailAddress}`, 14, 34);
+
+    // --- Overview Stats ---
+    doc.setDrawColor(200);
+    doc.line(14, 40, 196, 40);
+
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Total Income", 14, 50);
+    doc.text("Total Expenses", 80, 50);
+    doc.text("Net Balance", 150, 50);
+
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(`${state.currency}${totalIncome.toLocaleString()}`, 14, 58);
+    doc.text(`${state.currency}${totalExpenses.toLocaleString()}`, 80, 58);
+    
+    const netColor = remainingBudget >= 0 ? [16, 185, 129] : [239, 68, 68]; // Green or Red
+    doc.setTextColor(netColor[0], netColor[1], netColor[2]);
+    doc.text(`${state.currency}${remainingBudget.toLocaleString()}`, 150, 58);
+
+    // --- Overview Graph (Visual Breakdown) ---
+    doc.setTextColor(0);
+    doc.setFontSize(12);
+    doc.text("Expense Breakdown", 14, 75);
+    
+    // Draw Stacked Bar
+    let currentX = 14;
+    const barWidth = 182; // Total width
+    const barHeight = 8;
+    const barY = 80;
+
+    if (totalExpenses > 0) {
+      state.categories.forEach(cat => {
+        const spent = currentMonthTransactions
+            .filter(t => t.categoryId === cat.id && t.type === 'expense')
             .reduce((sum, t) => sum + t.amount, 0);
-        return amt > 0 ? `- ${c.name}: ${state.currency}${amt}` : null;
-      }).filter(Boolean).join('\n')}
-    `;
-    window.location.href = `mailto:?subject=Budget Report - ${monthStr}&body=${encodeURIComponent(body)}`;
+        
+        if (spent > 0) {
+          const width = (spent / totalExpenses) * barWidth;
+          doc.setFillColor(cat.color);
+          doc.rect(currentX, barY, width, barHeight, 'F');
+          currentX += width;
+        }
+      });
+    } else {
+        doc.setFillColor(240, 240, 240);
+        doc.rect(currentX, barY, barWidth, barHeight, 'F');
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text("No expenses recorded", 14 + barWidth/2, barY + 5, { align: 'center' });
+    }
+
+    // Legend
+    let legendY = 95;
+    state.categories.forEach(cat => {
+        const spent = currentMonthTransactions
+            .filter(t => t.categoryId === cat.id && t.type === 'expense')
+            .reduce((sum, t) => sum + t.amount, 0);
+        
+        if (spent > 0) {
+            const percentage = ((spent / totalExpenses) * 100).toFixed(1);
+            doc.setFillColor(cat.color);
+            doc.circle(16, legendY, 2, 'F');
+            doc.setFontSize(9);
+            doc.setTextColor(50);
+            doc.text(`${cat.name} - ${state.currency}${spent.toLocaleString()} (${percentage}%)`, 22, legendY + 1);
+            legendY += 6;
+        }
+    });
+
+    // --- Transaction Table ---
+    // @ts-ignore
+    autoTable(doc, {
+        startY: legendY + 10,
+        head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
+        body: currentMonthTransactions.map(t => {
+            const cat = state.categories.find(c => c.id === t.categoryId);
+            return [
+                new Date(t.date).toLocaleDateString(),
+                t.description,
+                cat?.name || 'Income',
+                t.type,
+                `${t.type === 'income' ? '+' : '-'}${state.currency}${t.amount.toLocaleString()}`
+            ];
+        }),
+        headStyles: { fillColor: [59, 130, 246] }, // Blue header
+        alternateRowStyles: { fillColor: [249, 250, 251] }
+    });
+
+    // Save
+    doc.save(`ZenBudget_Report_${monthStr}.pdf`);
+    
+    setIsSendingEmail(false);
+    setIsEmailModalOpen(false);
+    setEmailAddress('');
+    
+    alert(`Report generated for ${emailAddress}!\n\nBecause this is a demo app, the PDF has been downloaded to your device instead of emailed. You can now attach it to an email yourself.`);
   };
 
   // --- Render Views ---
@@ -880,14 +987,60 @@ const App: React.FC = () => {
                 <div className="border-t border-gray-100 dark:border-slate-700 pt-4">
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Actions</h4>
                   <button 
-                    onClick={generateEmailReport}
+                    onClick={() => {
+                        setIsUserModalOpen(false);
+                        setIsEmailModalOpen(true);
+                    }}
                     className="w-full flex items-center justify-center gap-2 bg-gray-900 dark:bg-slate-700 hover:bg-gray-800 dark:hover:bg-slate-600 text-white py-3 rounded-xl transition-colors"
                   >
-                    <Download size={18} />
+                    <Mail size={18} />
                     Email Report for {currentDate.toLocaleString('default', { month: 'short' })}
                   </button>
                 </div>
             </div>
+      </Modal>
+
+      {/* Email Report Modal */}
+      <Modal isOpen={isEmailModalOpen} onClose={() => setIsEmailModalOpen(false)} title="Email PDF Report">
+         <form onSubmit={handleSendReport} className="space-y-4">
+            <div className="text-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600 dark:text-blue-400">
+                    <Mail size={24} />
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Enter your email to receive a detailed PDF report including your spending graph and full transaction history.
+                </p>
+            </div>
+            
+            <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Email Address</label>
+                <input 
+                    type="email" 
+                    required
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                    placeholder="you@example.com"
+                />
+            </div>
+
+            <button 
+                type="submit" 
+                disabled={isSendingEmail}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+                {isSendingEmail ? (
+                    <>
+                        <Loader size={18} className="animate-spin" />
+                        Generating PDF...
+                    </>
+                ) : (
+                    <>
+                        Send Report
+                    </>
+                )}
+            </button>
+         </form>
       </Modal>
 
     </div>
