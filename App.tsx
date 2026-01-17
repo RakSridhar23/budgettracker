@@ -21,7 +21,8 @@ import {
   Download,
   Pencil,
   Mail,
-  Loader
+  Loader,
+  Check
 } from 'lucide-react';
 import { TEMPLATES, COLORS, CURRENCIES } from './constants';
 import { AppState, Category, Transaction, RecurrenceFrequency } from './types';
@@ -59,6 +60,7 @@ const App: React.FC = () => {
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
 
   // Transaction Form State
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -362,7 +364,7 @@ const App: React.FC = () => {
 
     setIsSendingEmail(true);
 
-    // Simulate Network Delay
+    // Simulate Network Delay and Generation Time
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     // Generate PDF
@@ -466,14 +468,25 @@ const App: React.FC = () => {
         alternateRowStyles: { fillColor: [249, 250, 251] }
     });
 
-    // Save
+    // Transition to Success State
+    setIsSendingEmail(false);
+    setIsEmailSent(true);
+
+    // Show Green Tick for 1.5 seconds
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Save File
     doc.save(`ZenBudget_Report_${monthStr}.pdf`);
     
-    setIsSendingEmail(false);
+    // Reset UI
+    setIsEmailSent(false);
     setIsEmailModalOpen(false);
     setEmailAddress('');
     
-    alert(`Report generated for ${emailAddress}!\n\nBecause this is a demo app, the PDF has been downloaded to your device instead of emailed. You can now attach it to an email yourself.`);
+    // Show info alert
+    setTimeout(() => {
+        alert(`Report generated for ${emailAddress}!\n\nBecause this is a demo app, the PDF has been downloaded to your device instead of emailed. You can now attach it to an email yourself.`);
+    }, 100);
   };
 
   // --- Render Views ---
@@ -1026,13 +1039,22 @@ const App: React.FC = () => {
 
             <button 
                 type="submit" 
-                disabled={isSendingEmail}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={isSendingEmail || isEmailSent}
+                className={`w-full font-medium py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
+                    isEmailSent 
+                    ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 scale-[1.02]' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-70 disabled:cursor-not-allowed'
+                }`}
             >
                 {isSendingEmail ? (
                     <>
                         <Loader size={18} className="animate-spin" />
                         Generating PDF...
+                    </>
+                ) : isEmailSent ? (
+                    <>
+                        <Check size={20} className="animate-bounce" />
+                        <span>Sent!</span>
                     </>
                 ) : (
                     <>
