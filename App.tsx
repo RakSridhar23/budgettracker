@@ -479,15 +479,20 @@ const App: React.FC = () => {
         {/* AI Insight Banner */}
         <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-800 p-6 rounded-2xl border border-indigo-100 dark:border-slate-700 relative overflow-hidden shadow-sm">
           <div className="absolute top-0 right-0 p-4 opacity-10 dark:opacity-5">
-            <Sparkles size={100} />
+             <span className="text-9xl grayscale opacity-20 select-none">🐼</span> 
           </div>
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2 text-indigo-700 dark:text-indigo-400 font-semibold text-sm">
-                <Sparkles size={16} />
-                <span>Smart Insight</span>
+                <span className="text-xl">🐼</span>
+                <span>Financial Buddy</span>
             </div>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              {isLoadingAdvice ? "Asking the financial guru..." : (aiAdvice || "Start adding transactions to get AI-powered insights.")}
+            <div className="flex gap-4">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed italic">
+                "{isLoadingAdvice ? "Eating bamboo and crunching numbers..." : (aiAdvice || "Start adding transactions to get some wisdom!")}"
+                </p>
+            </div>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-3 border-t border-indigo-100 dark:border-slate-700 pt-2">
+                * This is not strictly financial advice. Always consult a professional.
             </p>
           </div>
         </div>

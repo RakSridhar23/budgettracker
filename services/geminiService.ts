@@ -27,7 +27,7 @@ export const getFinancialAdvice = async (
   }).join(', ');
 
   const prompt = `
-    You are a friendly, encouraging financial coach for a budgeting app called ZenBudget.
+    You are a friendly, encouraging financial buddy (a cute panda character) for a budgeting app called ZenBudget.
     
     Here is the user's current month snapshot:
     - Monthly Income Goal: ${currency}${income}
@@ -38,7 +38,8 @@ export const getFinancialAdvice = async (
     Provide a short, 2-3 sentence insight or tip. 
     If they are over budget, be gentle but firm. 
     If they are doing well, congratulate them.
-    Keep the tone casual and accessible to anyone from age 10 to 80.
+    Keep the tone casual, fun, and accessible to anyone from age 10 to 80.
+    Occasionally use a panda-related pun if appropriate, but keep it subtle.
     Do not use complex financial jargon.
   `;
 
@@ -50,7 +51,7 @@ export const getFinancialAdvice = async (
     return response.text || "Keep tracking your spending to stay on top of your goals!";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "I'm having trouble connecting to the financial wisdom cloud right now. Check back later!";
+    return "I'm having trouble connecting to the bamboo forest right now. Check back later!";
   }
 };
 
