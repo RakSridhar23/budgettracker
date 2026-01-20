@@ -22,7 +22,8 @@ import {
   Pencil,
   Mail,
   Loader,
-  Check
+  Check,
+  X
 } from 'lucide-react';
 import { TEMPLATES, COLORS, CURRENCIES } from './constants';
 import { AppState, Category, Transaction, RecurrenceFrequency } from './types';
@@ -81,9 +82,12 @@ const App: React.FC = () => {
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
 
-  // New Category Form State
+  // Category Management State
   const [newCatName, setNewCatName] = useState('');
   const [newCatColor, setNewCatColor] = useState(COLORS[0]);
+  const [newCatLimit, setNewCatLimit] = useState('');
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+
 
   // --- Persistence ---
   useEffect(() => {
@@ -323,18 +327,48 @@ const App: React.FC = () => {
     setRecurrenceFreq('monthly');
   };
 
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleSaveCategory = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCatName) return;
-    const newCat: Category = {
-      id: generateId(),
-      name: newCatName,
-      color: newCatColor,
-      icon: 'Tag' 
-    };
-    setState(prev => ({ ...prev, categories: [...prev.categories, newCat] }));
-    setIsCategoryModalOpen(false);
+
+    if (editingCategoryId) {
+        setState(prev => ({
+            ...prev,
+            categories: prev.categories.map(c => c.id === editingCategoryId ? {
+                ...c,
+                name: newCatName,
+                color: newCatColor,
+                budgetLimit: parseFloat(newCatLimit) || 0
+            } : c)
+        }));
+        setEditingCategoryId(null);
+    } else {
+        const newCat: Category = {
+          id: generateId(),
+          name: newCatName,
+          color: newCatColor,
+          icon: 'Tag',
+          budgetLimit: parseFloat(newCatLimit) || 0
+        };
+        setState(prev => ({ ...prev, categories: [...prev.categories, newCat] }));
+    }
     setNewCatName('');
+    setNewCatLimit('');
+    setNewCatColor(COLORS[0]);
+  };
+
+  const handleEditCategory = (cat: Category) => {
+    setNewCatName(cat.name);
+    setNewCatLimit(cat.budgetLimit?.toString() || '');
+    setNewCatColor(cat.color);
+    setEditingCategoryId(cat.id);
+  };
+
+  const handleCancelEditCategory = () => {
+    setNewCatName('');
+    setNewCatLimit('');
+    setNewCatColor(COLORS[0]);
+    setEditingCategoryId(null);
   };
 
   const handleDeleteTransaction = (id: string) => {
@@ -691,31 +725,49 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                         <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Top Categories</h3>
+                         <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Category Budgets</h3>
                          <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                             {state.categories.map(cat => {
                                 const spent = currentMonthTransactions
                                     .filter(t => t.categoryId === cat.id && t.type === 'expense')
                                     .reduce((sum, t) => sum + t.amount, 0);
-                                if (spent === 0) return null;
-                                const percent = totalExpenses > 0 ? (spent / totalExpenses) * 100 : 0;
+                                
+                                const limit = cat.budgetLimit || 0;
+                                const hasLimit = limit > 0;
+                                const percent = hasLimit ? (spent / limit) * 100 : (totalExpenses > 0 ? (spent / totalExpenses) * 100 : 0);
+                                
+                                // Color Logic: Green if OK, Yellow if > 85%, Red if > 100%
+                                let progressColor = cat.color;
+                                if (hasLimit) {
+                                    if (percent > 100) progressColor = '#ef4444'; // Red
+                                    else if (percent > 85) progressColor = '#f59e0b'; // Amber
+                                }
+
+                                if (spent === 0 && !hasLimit) return null;
                                 
                                 return (
                                     <div key={cat.id}>
                                         <div className="flex justify-between text-sm mb-1">
                                             <span className="text-gray-700 dark:text-slate-300 font-medium">{cat.name}</span>
-                                            <span className="text-gray-900 dark:text-white font-bold">{state.currency}{spent.toLocaleString()}</span>
+                                            <div className="text-right">
+                                                <span className="text-gray-900 dark:text-white font-bold">{state.currency}{spent.toLocaleString()}</span>
+                                                {hasLimit && (
+                                                    <span className="text-gray-400 text-xs ml-1">
+                                                        / {state.currency}{limit.toLocaleString()}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
                                             <div 
-                                                className="h-2 rounded-full" 
-                                                style={{ width: `${percent}%`, backgroundColor: cat.color }}
+                                                className="h-2 rounded-full transition-all duration-500" 
+                                                style={{ width: `${Math.min(percent, 100)}%`, backgroundColor: progressColor }}
                                             ></div>
                                         </div>
                                     </div>
                                 );
                             })}
-                            {totalExpenses === 0 && <p className="text-gray-400 text-sm italic">No data for this month.</p>}
+                            {state.categories.length === 0 && <p className="text-gray-400 text-sm italic">No categories set.</p>}
                          </div>
                     </div>
                 </div>
@@ -908,39 +960,82 @@ const App: React.FC = () => {
       {/* Category Manager Modal */}
       <Modal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} title="Manage Categories">
             <div className="space-y-6">
+                {/* List of Existing Categories */}
                 <div className="max-h-60 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                     {state.categories.map(cat => (
                          <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700 rounded-lg group">
                             <div className="flex items-center gap-3">
                                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color }}></div>
-                                <span className="text-sm font-medium text-gray-700 dark:text-slate-200">{cat.name}</span>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-medium text-gray-700 dark:text-slate-200">{cat.name}</span>
+                                    {cat.budgetLimit && cat.budgetLimit > 0 && (
+                                        <span className="text-xs text-gray-400">Limit: {state.currency}{cat.budgetLimit}</span>
+                                    )}
+                                </div>
                             </div>
-                            <button 
-                                onClick={() => {
-                                    setState(prev => ({
-                                        ...prev,
-                                        categories: prev.categories.filter(c => c.id !== cat.id)
-                                    }));
-                                }}
-                                className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
-                            >
-                                <Trash2 size={16} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button 
+                                    onClick={() => handleEditCategory(cat)}
+                                    className="text-gray-400 hover:text-blue-500 transition-colors p-1"
+                                    title="Edit"
+                                >
+                                    <Pencil size={14} />
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        setState(prev => ({
+                                            ...prev,
+                                            categories: prev.categories.filter(c => c.id !== cat.id)
+                                        }));
+                                    }}
+                                    className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                    title="Delete"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
                          </div>
                     ))}
                 </div>
 
+                {/* Add / Edit Form */}
                 <div className="border-t border-gray-100 dark:border-slate-700 pt-4">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Add New Category</h4>
-                    <form onSubmit={handleAddCategory} className="space-y-3">
-                        <div>
-                            <input 
-                                type="text"
-                                placeholder="Category Name"
-                                value={newCatName}
-                                onChange={(e) => setNewCatName(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
-                            />
+                    <div className="flex justify-between items-center mb-3">
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {editingCategoryId ? 'Edit Category' : 'Add New Category'}
+                        </h4>
+                        {editingCategoryId && (
+                            <button 
+                                onClick={handleCancelEditCategory}
+                                className="text-xs text-gray-500 hover:text-gray-800 dark:hover:text-gray-300 flex items-center gap-1"
+                            >
+                                <X size={12} /> Cancel
+                            </button>
+                        )}
+                    </div>
+                    
+                    <form onSubmit={handleSaveCategory} className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="col-span-2 sm:col-span-1">
+                                <input 
+                                    type="text"
+                                    placeholder="Category Name"
+                                    required
+                                    value={newCatName}
+                                    onChange={(e) => setNewCatName(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                                />
+                            </div>
+                            <div className="col-span-2 sm:col-span-1 relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">{state.currency}</span>
+                                <input 
+                                    type="number"
+                                    placeholder="Budget Limit (Opt)"
+                                    value={newCatLimit}
+                                    onChange={(e) => setNewCatLimit(e.target.value)}
+                                    className="w-full pl-7 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                                />
+                            </div>
                         </div>
                         <div>
                             <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
@@ -959,7 +1054,7 @@ const App: React.FC = () => {
                             type="submit" 
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors"
                         >
-                            Create Category
+                            {editingCategoryId ? 'Update Category' : 'Create Category'}
                         </button>
                     </form>
                 </div>
