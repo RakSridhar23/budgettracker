@@ -116,7 +116,10 @@ export const parseTransactionFromText = async (
             amount: { type: Type.NUMBER },
             description: { type: Type.STRING },
             categoryName: { type: Type.STRING },
-            type: { type: Type.STRING, enum: ["expense", "income"] }
+            type: { 
+              type: Type.STRING,
+              description: "Must be exactly 'expense' or 'income'" 
+            }
           }
         }
       }

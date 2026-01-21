@@ -307,9 +307,18 @@ const App: React.FC = () => {
     };
 
     recognition.onerror = (event: any) => {
+      // Handle no-speech error gracefully without alerting
+      if (event.error === 'no-speech') {
+        console.log("No speech detected.");
+        setIsListening(false);
+        setIsProcessingVoice(false);
+        return;
+      }
+
       console.error("Speech recognition error", event.error);
       setIsListening(false);
       setIsProcessingVoice(false);
+      
       if (event.error === 'not-allowed') {
         alert("Microphone access blocked. Please allow permission.");
       }
@@ -321,7 +330,7 @@ const App: React.FC = () => {
 
   const handleSaveTransaction = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !description) return;
+    if (!amount) return; // Removed !description check
 
     if (editingId) {
       // Update Existing
@@ -985,7 +994,6 @@ const App: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-stone-300 mb-1">Description</label>
                 <input 
                     type="text" 
-                    required
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     onBlur={handleDescriptionBlur}
