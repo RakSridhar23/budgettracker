@@ -24,7 +24,11 @@ import {
   X,
   Mic,
   List,
-  LogOut
+  LogOut,
+  ChevronLeft,
+  Palette,
+  Tag,
+  LayoutGrid
 } from 'lucide-react';
 import { TEMPLATES, COLORS, CURRENCIES } from './constants';
 import { AppState, Category, Transaction, RecurrenceFrequency } from './types';
@@ -96,6 +100,7 @@ const App: React.FC = () => {
   const [newCatColor, setNewCatColor] = useState(COLORS[0]);
   const [newCatLimit, setNewCatLimit] = useState('');
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [categoryViewMode, setCategoryViewMode] = useState<'list' | 'form'>('list');
 
   // Voice State
   const [isListening, setIsListening] = useState(false);
@@ -424,6 +429,7 @@ const App: React.FC = () => {
     setNewCatName('');
     setNewCatLimit('');
     setNewCatColor(COLORS[0]);
+    setCategoryViewMode('list');
   };
 
   const handleEditCategory = (cat: Category) => {
@@ -431,6 +437,7 @@ const App: React.FC = () => {
     setNewCatLimit(cat.budgetLimit?.toString() || '');
     setNewCatColor(cat.color);
     setEditingCategoryId(cat.id);
+    setCategoryViewMode('form');
   };
 
   const handleCancelEditCategory = () => {
@@ -438,6 +445,7 @@ const App: React.FC = () => {
     setNewCatLimit('');
     setNewCatColor(COLORS[0]);
     setEditingCategoryId(null);
+    setCategoryViewMode('list');
   };
 
   const handleDeleteTransaction = (id: string) => {
@@ -613,12 +621,7 @@ const App: React.FC = () => {
                         <h3 className="font-semibold text-gray-900 dark:text-stone-100 text-sm flex items-center gap-2">
                             Breakdown
                         </h3>
-                        <button 
-                            onClick={() => setIsCategoryModalOpen(true)}
-                            className="text-xs text-emerald-600 dark:text-emerald-400 font-medium hover:underline"
-                        >
-                            Edit Cats
-                        </button>
+                        {/* Hidden link removed as requested */}
                     </div>
                     <SpendingChart transactions={currentMonthTransactions} categories={state.categories} />
                 </div>
@@ -802,6 +805,19 @@ const App: React.FC = () => {
                                 <span className="truncate">{cat.name}</span>
                             </button>
                         ))}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsAddModalOpen(false);
+                                setCategoryViewMode('form');
+                                setEditingCategoryId(null);
+                                setIsCategoryModalOpen(true);
+                            }}
+                            className="flex items-center justify-center gap-2 p-2 rounded-lg border border-dashed border-gray-300 dark:border-slate-600 text-gray-500 dark:text-stone-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                            <Plus size={16} />
+                            <span className="text-sm">New Category</span>
+                        </button>
                     </div>
                 </div>
             )}
@@ -824,87 +840,177 @@ const App: React.FC = () => {
       </Modal>
 
       {/* Category Manager Modal */}
-      <Modal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} title="Manage Categories">
-            <div className="space-y-6">
-                <div className="max-h-60 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                    {state.categories.map(cat => (
-                         <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 rounded-lg group border border-emerald-500/10">
-                            <div className="flex items-center gap-3">
-                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color }}></div>
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-medium text-gray-700 dark:text-stone-200">{cat.name}</span>
-                                    {cat.budgetLimit && cat.budgetLimit > 0 && (
-                                        <span className="text-xs text-gray-400">Limit: {state.currency}{cat.budgetLimit}</span>
-                                    )}
+      <Modal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} title={categoryViewMode === 'list' ? "Categories" : (editingCategoryId ? "Edit Category" : "New Category")}>
+        {categoryViewMode === 'list' ? (
+             <div className="flex flex-col h-[400px]">
+                <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
+                    {state.categories.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center p-6 text-gray-400 dark:text-slate-500">
+                             <Tag size={48} className="mb-4 opacity-50"/>
+                             <p>No categories yet.</p>
+                             <p className="text-sm">Create one to start tracking!</p>
+                        </div>
+                    ) : (
+                        state.categories.map(cat => (
+                            <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" style={{ backgroundColor: cat.color }}>
+                                        {cat.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-gray-900 dark:text-white">{cat.name}</span>
+                                        {cat.budgetLimit ? (
+                                             <span className="text-xs text-gray-500">Limit: {state.currency}{cat.budgetLimit}</span>
+                                        ) : (
+                                            <span className="text-xs text-gray-400">No Limit</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <button 
+                                        onClick={() => handleEditCategory(cat)}
+                                        className="p-2 text-gray-400 hover:text-emerald-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
+                                    >
+                                        <Pencil size={18} />
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                             setState(prev => ({
+                                                ...prev,
+                                                categories: prev.categories.filter(c => c.id !== cat.id)
+                                            }));
+                                        }}
+                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <button 
-                                    onClick={() => handleEditCategory(cat)}
-                                    className="text-gray-400 hover:text-emerald-500 transition-colors p-1"
-                                >
-                                    <Pencil size={14} />
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        setState(prev => ({
-                                            ...prev,
-                                            categories: prev.categories.filter(c => c.id !== cat.id)
-                                        }));
-                                    }}
-                                    className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
-                            </div>
-                         </div>
-                    ))}
+                        ))
+                    )}
                 </div>
-                <div className="border-t border-gray-100 dark:border-slate-700 pt-4">
-                     <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                            {editingCategoryId ? 'Edit Category' : 'Add New Category'}
-                    </h4>
-                    <form onSubmit={handleSaveCategory} className="space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
+                <div className="pt-4 mt-2 border-t border-gray-100 dark:border-slate-800">
+                    <button 
+                        onClick={() => {
+                            setNewCatName('');
+                            setNewCatLimit('');
+                            setNewCatColor(COLORS[0]);
+                            setEditingCategoryId(null);
+                            setCategoryViewMode('form');
+                        }}
+                        className="w-full bg-gray-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
+                    >
+                        <Plus size={20} />
+                        Create New Category
+                    </button>
+                </div>
+             </div>
+        ) : (
+            <form onSubmit={handleSaveCategory} className="space-y-6">
+                {/* Live Preview */}
+                <div className="flex justify-center py-4">
+                    <div className="flex items-center gap-3 px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 transform scale-100" style={{ backgroundColor: newCatColor }}>
+                        <span className="text-white font-bold text-lg">{newCatName || 'Category Name'}</span>
+                        {newCatLimit && (
+                            <span className="bg-white/20 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+                                {state.currency}{newCatLimit}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 tracking-wider">Name</label>
+                        <input 
+                            type="text"
+                            required
+                            value={newCatName}
+                            onChange={(e) => setNewCatName(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white font-medium"
+                            placeholder="e.g., Entertainment"
+                            autoFocus
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 tracking-wider">Monthly Limit (Optional)</label>
+                        <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{state.currency}</span>
                             <input 
-                                type="text"
-                                placeholder="Name"
-                                required
-                                value={newCatName}
-                                onChange={(e) => setNewCatName(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-                            />
-                             <input 
                                 type="number"
-                                placeholder="Limit (Opt)"
                                 value={newCatLimit}
                                 onChange={(e) => setNewCatLimit(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
+                                className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
+                                placeholder="0"
                             />
                         </div>
-                        <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-3 tracking-wider">Color</label>
+                        <div className="grid grid-cols-5 gap-3">
                             {COLORS.map(color => (
                                 <button
                                     key={color}
                                     type="button"
                                     onClick={() => setNewCatColor(color)}
-                                    className={`w-6 h-6 rounded-full shrink-0 transition-transform ${newCatColor === color ? 'scale-110 ring-2 ring-offset-2 ring-gray-400' : ''}`}
+                                    className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${newCatColor === color ? 'ring-2 ring-offset-2 ring-gray-400 scale-110 shadow-md' : 'hover:scale-105'}`}
                                     style={{ backgroundColor: color }}
-                                />
+                                >
+                                    {newCatColor === color && <Check size={16} className="text-white" />}
+                                </button>
                             ))}
                         </div>
-                        <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg text-sm font-medium transition-colors">
-                            {editingCategoryId ? 'Update' : 'Create'}
-                        </button>
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <div className="flex gap-3 pt-2">
+                    <button 
+                        type="button"
+                        onClick={handleCancelEditCategory}
+                        className="flex-1 py-3 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        type="submit" 
+                        className="flex-[2] py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20"
+                    >
+                        {editingCategoryId ? 'Save Changes' : 'Create Category'}
+                    </button>
+                </div>
+            </form>
+        )}
       </Modal>
 
       {/* Profile Modal */}
       <Modal isOpen={isUserModalOpen} onClose={() => setIsUserModalOpen(false)} title="My Profile">
             <div className="space-y-6">
                 <div>
+                   <h4 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-3 tracking-wider">Account Settings</h4>
+                   <button 
+                      onClick={() => {
+                          setIsUserModalOpen(false);
+                          setCategoryViewMode('list');
+                          setIsCategoryModalOpen(true);
+                      }}
+                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors group"
+                   >
+                       <div className="flex items-center gap-3">
+                           <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-emerald-600 dark:text-emerald-400 shadow-sm">
+                                <LayoutGrid size={20} />
+                           </div>
+                           <div className="text-left">
+                               <p className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Manage Categories</p>
+                               <p className="text-xs text-gray-500 dark:text-stone-400">Add, edit or remove spending categories</p>
+                           </div>
+                       </div>
+                       <ChevronLeft size={18} className="rotate-180 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+                   </button>
+                </div>
+
+                <div className="border-t border-gray-100 dark:border-slate-800 pt-4">
                   <h4 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-3 tracking-wider">Currency</h4>
                   <div className="grid grid-cols-4 gap-2">
                     {CURRENCIES.map(c => (
@@ -932,7 +1038,7 @@ const App: React.FC = () => {
                    </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-2">
                      <button 
                         onClick={() => { setIsUserModalOpen(false); setIsEmailModalOpen(true); }}
                         className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
