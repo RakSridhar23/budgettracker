@@ -28,7 +28,8 @@ import {
   ChevronLeft,
   Palette,
   Tag,
-  LayoutGrid
+  LayoutGrid,
+  Bell
 } from 'lucide-react';
 import { TEMPLATES, COLORS, CURRENCIES } from './constants';
 import { AppState, Category, Transaction, RecurrenceFrequency } from './types';
@@ -54,7 +55,7 @@ const App: React.FC = () => {
       hasOnboarded: false,
       monthlyIncome: 0,
       currency: '$',
-      theme: 'dark', // Default to Dark
+      theme: 'light', // Default to Light for Panda Theme
       categories: [],
       transactions: []
     };
@@ -535,131 +536,151 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen pb-28 md:pb-12 transition-colors duration-300 ${state.theme === 'dark' ? 'bg-slate-950' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen pb-28 md:pb-12 transition-colors duration-500 font-sans ${state.theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-panda-50 text-slate-800'}`}>
       
-      {/* Mobile Header */}
-      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 transition-colors border-b border-gray-100 dark:border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 py-3">
+      {/* Mobile Header - Panda Style */}
+      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl sticky top-0 z-30 transition-all border-b border-panda-100 dark:border-slate-800 shadow-sm">
+        <div className="max-w-4xl mx-auto px-5 py-4">
           <div className="flex items-center justify-between">
-             <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-sm">
-                  <Wallet size={16} />
+             <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-tr from-panda-600 to-accent-pink rounded-xl flex items-center justify-center text-white shadow-lg shadow-panda-500/20 transform hover:scale-105 transition-transform">
+                   <span className="text-xl">🐼</span>
                 </div>
-                <h1 className="text-lg font-bold text-gray-900 dark:text-stone-100 tracking-tight">Vyaya</h1>
+                <div>
+                  <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-none">Vyaya</h1>
+                  <p className="text-[10px] font-bold text-panda-500 uppercase tracking-widest">Budget Buddy</p>
+                </div>
               </div>
               <button 
                   onClick={handleConfetti}
-                  className="p-2 rounded-full text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors"
+                  className="w-9 h-9 rounded-full bg-panda-50 dark:bg-slate-800 flex items-center justify-center text-accent-amber hover:bg-accent-amber hover:text-white transition-all duration-300"
                 >
-                  <Sparkles size={18} />
+                  <Sparkles size={16} />
               </button>
           </div>
           
-          <div className="flex items-center justify-between mt-4 mb-2">
-             <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-gray-900 dark:hover:text-emerald-400 transition-colors">
-              <ArrowLeft size={18}/>
+          <div className="flex items-center justify-between mt-6 mb-1">
+             <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-panda-100 dark:hover:bg-slate-800 text-panda-400 hover:text-panda-700 dark:text-slate-500 dark:hover:text-white transition-all">
+              <ChevronLeft size={20}/>
             </button>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-stone-100">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-white">
               {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
             </h2>
-             <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-gray-900 dark:hover:text-emerald-400 transition-colors">
-              <ArrowRight size={18}/>
+             <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-panda-100 dark:hover:bg-slate-800 text-panda-400 hover:text-panda-700 dark:text-slate-500 dark:hover:text-white transition-all">
+              <ChevronLeft size={20} className="rotate-180"/>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 pt-4 pb-8 space-y-6">
+      <main className="max-w-4xl mx-auto px-5 pt-6 pb-8 space-y-8">
         
-        {/* Segmented Control */}
-        <div className="flex p-1 bg-gray-200 dark:bg-slate-900 rounded-xl mb-4">
+        {/* Toggle Switch */}
+        <div className="flex p-1.5 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-panda-100 dark:border-slate-800 mx-auto max-w-sm">
             <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
                     activeTab === 'dashboard' 
-                    ? 'bg-white dark:bg-slate-800 text-gray-900 dark:text-white shadow-sm' 
-                    : 'text-gray-500 dark:text-gray-400'
+                    ? 'bg-panda-500 text-white shadow-md shadow-panda-500/25' 
+                    : 'text-slate-400 dark:text-slate-500 hover:text-panda-600'
                 }`}
             >
-                <PieIcon size={16} />
                 Overview
             </button>
             <button
                 onClick={() => setActiveTab('transactions')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
                     activeTab === 'transactions' 
-                    ? 'bg-white dark:bg-slate-800 text-gray-900 dark:text-white shadow-sm' 
-                    : 'text-gray-500 dark:text-gray-400'
+                    ? 'bg-panda-500 text-white shadow-md shadow-panda-500/25' 
+                    : 'text-slate-400 dark:text-slate-500 hover:text-panda-600'
                 }`}
             >
-                <List size={16} />
-                Transactions
+                List
             </button>
         </div>
 
+        {/* Panda AI Insight Banner */}
+        <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-panda-600 to-accent-pink p-1 shadow-lg shadow-panda-500/20 transition-all hover:shadow-panda-500/30">
+          <div className="relative h-full w-full rounded-[20px] bg-white dark:bg-slate-900 p-5">
+             <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity">
+                <span className="text-9xl grayscale">🐼</span>
+             </div>
+             
+             <div className="relative z-10 flex gap-4 items-start">
+                <div className="w-12 h-12 shrink-0 bg-panda-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-2xl border-2 border-panda-100 dark:border-slate-700">
+                    🐼
+                </div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-black uppercase text-panda-500 tracking-wider">Insight</span>
+                        {isLoadingAdvice && <Loader size={10} className="animate-spin text-panda-400"/>}
+                    </div>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">
+                        "{isLoadingAdvice ? "Munching bamboo, calculating figures..." : (aiAdvice || "Hey! I'm your panda pal. Add some expenses so I can help you save!")}"
+                    </p>
+                </div>
+             </div>
+          </div>
+        </div>
+
         {/* Financial Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <OverviewCard 
             title="Income" 
             amount={state.monthlyIncome} 
             currency={state.currency} 
-            extra={totalIncome - state.monthlyIncome}
-            color="emerald"
+            color="violet"
+            icon={<TrendingUp size={18} />}
           />
           
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-emerald-500/10 flex flex-col transition-colors">
-            <span className="text-xs text-gray-500 dark:text-stone-400 font-medium mb-1">Total Spent</span>
-            <span className="text-xl font-bold text-gray-900 dark:text-stone-100">{state.currency}{totalExpenses.toLocaleString()}</span>
-            <div className="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
-                <div 
-                    className={`h-1.5 rounded-full transition-all duration-500 ${spendPercentage > 100 ? 'bg-red-500' : 'bg-emerald-500'}`} 
-                    style={{ width: `${Math.min(spendPercentage, 100)}%` }}
-                ></div>
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-panda-100 dark:border-slate-800 flex flex-col justify-between hover:border-panda-200 transition-colors">
+            <div className="flex justify-between items-start mb-2">
+                 <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Spent</span>
+                 <div className="p-2 rounded-lg bg-accent-pink/10 text-accent-pink">
+                    <Wallet size={18} />
+                 </div>
             </div>
-            <span className="text-[10px] text-gray-400 mt-2 text-right">{spendPercentage.toFixed(0)}% used</span>
+            <div>
+                <span className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">{state.currency}{totalExpenses.toLocaleString()}</span>
+                <div className="w-full bg-panda-50 dark:bg-slate-800 rounded-full h-2 mt-4 overflow-hidden">
+                    <div 
+                        className={`h-2 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-accent-pink to-purple-500`} 
+                        style={{ width: `${Math.min(spendPercentage, 100)}%` }}
+                    ></div>
+                </div>
+                <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400">
+                    <span>0%</span>
+                    <span>{spendPercentage.toFixed(0)}% used</span>
+                </div>
+            </div>
           </div>
 
           <OverviewCard 
              title="Left" 
              amount={remainingBudget} 
              currency={state.currency}
-             color={remainingBudget < 0 ? 'red' : 'emerald'}
-             subtext={remainingBudget < 0 ? 'Over budget' : 'Safe to spend'}
+             color={remainingBudget < 0 ? 'red' : 'teal'}
+             subtext={remainingBudget < 0 ? 'Over Budget' : 'Safe to Spend'}
+             icon={<PieIcon size={18} />}
           />
-        </div>
-
-        {/* AI Insight Banner */}
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-900 p-5 rounded-2xl border border-emerald-500/20 relative overflow-hidden shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-10 dark:opacity-5">
-             <span className="text-8xl grayscale opacity-20 select-none">🐼</span> 
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2 text-emerald-700 dark:text-emerald-400 font-semibold text-xs">
-                <span>🐼 Financial Buddy</span>
-            </div>
-            <div className="flex gap-4">
-                <p className="text-sm text-gray-700 dark:text-stone-300 leading-relaxed italic">
-                "{isLoadingAdvice ? "Eating bamboo and crunching numbers..." : (aiAdvice || "Start adding transactions to get some wisdom!")}"
-                </p>
-            </div>
-          </div>
         </div>
 
         {activeTab === 'dashboard' ? (
             <div className="space-y-6">
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-emerald-500/10">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="font-semibold text-gray-900 dark:text-stone-100 text-sm flex items-center gap-2">
-                            Breakdown
+                {/* Chart Card */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-panda-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            Spending Breakdown
                         </h3>
-                        {/* Hidden link removed as requested */}
                     </div>
                     <SpendingChart transactions={currentMonthTransactions} categories={state.categories} />
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-emerald-500/10">
-                        <h3 className="font-semibold text-gray-900 dark:text-stone-100 mb-4 text-sm">Budgets</h3>
-                        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {/* Categories List */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-panda-100 dark:border-slate-800">
+                        <h3 className="font-bold text-slate-800 dark:text-white mb-6">Your Budgets</h3>
+                        <div className="space-y-5 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {state.categories.map(cat => {
                             const spent = currentMonthTransactions
                                 .filter(t => t.categoryId === cat.id && t.type === 'expense')
@@ -669,74 +690,88 @@ const App: React.FC = () => {
                             const hasLimit = limit > 0;
                             const percent = hasLimit ? (spent / limit) * 100 : (totalExpenses > 0 ? (spent / totalExpenses) * 100 : 0);
                             
+                            // Determine color based on limit
                             let progressColor = cat.color;
                             if (hasLimit) {
-                                if (percent > 100) progressColor = '#ef4444'; // Red
-                                else if (percent > 85) progressColor = '#f59e0b'; // Amber
+                                if (percent > 100) progressColor = '#ef4444'; 
+                                else if (percent > 85) progressColor = '#f59e0b';
                             }
-
                             const incomePercentage = state.monthlyIncome > 0 ? (spent / state.monthlyIncome) * 100 : 0;
 
                             if (spent === 0 && !hasLimit) return null;
                             
                             return (
-                                <div key={cat.id}>
-                                    <div className="flex justify-between items-end text-xs mb-1">
-                                         <div>
-                                            <span className="text-gray-700 dark:text-stone-300 font-medium block">{cat.name}</span>
-                                            <span className="text-[10px] text-gray-400 dark:text-stone-500 font-medium">
-                                                {incomePercentage < 0.1 && spent > 0 ? '< 0.1' : incomePercentage.toFixed(1)}% of income
+                                <div key={cat.id} className="group">
+                                    <div className="flex justify-between items-end text-sm mb-2">
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-slate-700 dark:text-slate-200">{cat.name}</span>
+                                            <span className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                                               {incomePercentage < 0.1 && spent > 0 ? '< 0.1' : incomePercentage.toFixed(1)}% of income
                                             </span>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-gray-900 dark:text-white font-bold">{state.currency}{spent.toLocaleString()}</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{state.currency}{spent.toLocaleString()}</span>
                                             {hasLimit && (
-                                                <span className="text-gray-400 text-[10px] ml-1">
+                                                <span className="text-slate-400 text-xs ml-1 font-medium">
                                                     / {state.currency}{limit.toLocaleString()}
                                                 </span>
                                             )}
                                         </div>
                                     </div>
-                                    <div className="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-1.5">
+                                    <div className="w-full bg-panda-50 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
                                         <div 
-                                            className="h-1.5 rounded-full transition-all duration-500" 
+                                            className="h-full rounded-full transition-all duration-700 ease-out" 
                                             style={{ width: `${Math.min(percent, 100)}%`, backgroundColor: progressColor }}
                                         ></div>
                                     </div>
                                 </div>
                             );
                         })}
-                        {state.categories.length === 0 && <p className="text-gray-400 text-sm italic">No categories set.</p>}
+                        {state.categories.length === 0 && (
+                             <div className="text-center py-8">
+                                <div className="inline-block p-3 rounded-full bg-panda-50 dark:bg-slate-800 text-panda-300 mb-2">
+                                    <Tag size={24} />
+                                </div>
+                                <p className="text-slate-400 text-sm font-medium">No categories set.</p>
+                             </div>
+                        )}
                         </div>
                 </div>
             </div>
         ) : (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-emerald-500/10 overflow-hidden">
-                {/* Mobile Transaction List */}
-                <div className="divide-y divide-gray-100 dark:divide-slate-800">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-panda-100 dark:border-slate-800 overflow-hidden min-h-[400px]">
+                {/* Transaction List */}
+                <div className="divide-y divide-panda-50 dark:divide-slate-800">
                     {filteredTransactions.length === 0 ? (
-                        <div className="p-8 text-center text-gray-400 dark:text-stone-500 text-sm">
-                            No transactions found.
+                        <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500">
+                            <div className="w-16 h-16 bg-panda-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                                <List size={24} className="opacity-50" />
+                            </div>
+                            <p className="font-medium">No transactions found.</p>
+                            <p className="text-xs opacity-70 mt-1">Tap the + button to add one!</p>
                         </div>
                     ) : (
                         filteredTransactions.map(t => {
                             const category = state.categories.find(c => c.id === t.categoryId);
                             return (
-                                <div key={t.id} onClick={() => handleEditClick(t)} className="p-4 flex items-center justify-between active:bg-gray-50 dark:active:bg-slate-800 transition-colors cursor-pointer">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: t.type === 'income' ? '#10b981' : category?.color || '#9ca3af' }}>
-                                            {t.type === 'income' ? 'IN' : (category?.name.substring(0,2).toUpperCase() || 'UN')}
+                                <div key={t.id} onClick={() => handleEditClick(t)} className="p-5 flex items-center justify-between hover:bg-panda-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                                    <div className="flex items-center gap-4">
+                                        <div 
+                                            className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-sm font-bold shadow-sm transition-transform group-hover:scale-105" 
+                                            style={{ backgroundColor: t.type === 'income' ? '#10b981' : category?.color || '#9ca3af' }}
+                                        >
+                                            {t.type === 'income' ? <TrendingUp size={20}/> : (category?.name.charAt(0).toUpperCase() || '?')}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-semibold text-gray-900 dark:text-white">{t.description}</p>
-                                            <p className="text-xs text-gray-500 dark:text-stone-400">
+                                            <p className="text-sm font-bold text-slate-800 dark:text-white">{t.description}</p>
+                                            <p className="text-xs font-medium text-slate-400 mt-0.5 flex items-center gap-1">
                                                 {new Date(t.date).toLocaleDateString()}
-                                                {t.isRecurring && <span className="ml-1 text-emerald-500">↻</span>}
+                                                {t.isRecurring && <span className="text-panda-500 bg-panda-100 dark:bg-panda-900/30 px-1.5 py-0.5 rounded text-[10px]">Recurring</span>}
                                             </p>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className={`text-sm font-bold ${t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
+                                        <p className={`text-base font-black ${t.type === 'income' ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
                                             {t.type === 'income' ? '+' : '-'}{state.currency}{t.amount.toFixed(2)}
                                         </p>
                                     </div>
@@ -749,98 +784,99 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-slate-800 pb-safe px-6 flex justify-between items-center z-40 h-20 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]">
-        <button onClick={() => setIsUserModalOpen(true)} className="flex flex-col items-center gap-1 w-12 text-gray-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            <User size={24} />
-            <span className="text-[10px] font-medium">Profile</span>
+      {/* Floating Bottom Dock */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/20 dark:border-slate-800 pl-6 pr-6 pt-3 pb-3 rounded-full flex items-center gap-8 shadow-2xl shadow-panda-900/10 z-50">
+        <button onClick={() => setIsUserModalOpen(true)} className="flex flex-col items-center gap-1 text-slate-400 hover:text-panda-600 dark:hover:text-panda-400 transition-colors">
+            <User size={22} />
         </button>
 
-        <div className="flex items-center gap-5 relative -top-6">
+        <div className="flex items-center gap-4">
             <button 
                 onClick={handleVoiceInput}
-                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${isListening ? 'bg-red-500 animate-pulse scale-110' : 'bg-emerald-500 text-white hover:bg-emerald-600'} border-[6px] border-white dark:border-slate-950`}
+                className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg shadow-panda-500/30 transition-all hover:scale-110 active:scale-95 ${isListening ? 'bg-red-500 animate-pulse' : 'bg-panda-100 text-panda-600 dark:bg-slate-800 dark:text-panda-400'}`}
             >
-                {isProcessingVoice ? <Loader size={22} className="animate-spin" /> : <Mic size={22} />}
+                {isProcessingVoice ? <Loader size={20} className="animate-spin" /> : <Mic size={20} />}
             </button>
             <button 
                 onClick={() => { resetForm(); setIsAddModalOpen(true); }}
-                className="w-16 h-16 rounded-full bg-gray-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shadow-xl border-[6px] border-white dark:border-slate-950 hover:scale-105 transition-transform"
+                className="w-14 h-14 rounded-full bg-gradient-to-tr from-panda-600 to-accent-pink text-white flex items-center justify-center shadow-xl shadow-panda-500/40 hover:scale-110 active:scale-95 transition-all border-4 border-white dark:border-slate-900"
             >
-                <Plus size={30} />
+                <Plus size={28} strokeWidth={3} />
             </button>
         </div>
 
-        <button onClick={() => setIsSettingsModalOpen(true)} className="flex flex-col items-center gap-1 w-12 text-gray-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            <Settings size={24} />
-            <span className="text-[10px] font-medium">Settings</span>
+        <button onClick={() => setIsSettingsModalOpen(true)} className="flex flex-col items-center gap-1 text-slate-400 hover:text-panda-600 dark:hover:text-panda-400 transition-colors">
+            <Settings size={22} />
         </button>
       </div>
 
       {/* Transaction Modal (Add/Edit) */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={editingId ? "Edit Transaction" : "Add Transaction"}>
-        <form onSubmit={handleSaveTransaction} className="space-y-4">
-            <div className="grid grid-cols-2 gap-2 bg-gray-100 dark:bg-slate-900 p-1 rounded-lg">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={editingId ? "Edit Transaction" : "New Transaction"}>
+        <form onSubmit={handleSaveTransaction} className="space-y-5">
+            <div className="grid grid-cols-2 gap-2 bg-panda-50 dark:bg-slate-800 p-1.5 rounded-2xl">
                 <button
                     type="button"
                     onClick={() => setTxType('expense')}
-                    className={`py-2 text-sm font-medium rounded-md transition-all ${txType === 'expense' ? 'bg-white dark:bg-slate-800 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-stone-400'}`}
+                    className={`py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${txType === 'expense' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600'}`}
                 >
                     Expense
                 </button>
                 <button
                     type="button"
                     onClick={() => setTxType('income')}
-                    className={`py-2 text-sm font-medium rounded-md transition-all ${txType === 'income' ? 'bg-white dark:bg-slate-800 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-stone-400'}`}
+                    className={`py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${txType === 'income' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600'}`}
                 >
                     Income
                 </button>
             </div>
 
-            <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-stone-300 mb-1">Amount</label>
-                <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{state.currency}</span>
+            <div className="bg-panda-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-panda-100 dark:border-slate-800">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Amount</label>
+                <div className="relative flex items-center">
+                    <span className="text-2xl font-bold text-slate-400 mr-2">{state.currency}</span>
                     <input 
                         type="number" 
                         step="0.01" 
                         required
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-lg font-semibold"
+                        className="w-full bg-transparent border-none text-3xl font-black text-slate-800 dark:text-white focus:ring-0 p-0 placeholder-slate-300"
                         placeholder="0.00"
+                        autoFocus
                     />
                 </div>
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-stone-300 mb-1">Description</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Description</label>
                 <input 
                     type="text" 
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     onBlur={handleDescriptionBlur}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-                    placeholder="e.g., Grocery shopping"
+                    className="w-full px-4 py-3.5 bg-white dark:bg-slate-900 border-2 border-panda-50 dark:border-slate-700 rounded-2xl focus:border-panda-500 focus:ring-4 focus:ring-panda-500/10 outline-none transition-all font-medium text-slate-800 dark:text-white"
+                    placeholder="What's this for?"
                 />
             </div>
 
             {txType === 'expense' && (
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-stone-300 mb-1 flex justify-between">
-                        Category
-                        {isSuggestingCategory && <span className="text-xs text-emerald-500 animate-pulse">AI suggestions...</span>}
-                    </label>
-                    <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Category</label>
+                        {isSuggestingCategory && <span className="text-[10px] font-bold text-panda-500 bg-panda-100 px-2 py-0.5 rounded-full animate-pulse">Panda Thinking...</span>}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2.5 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                         {state.categories.map(cat => (
                             <button
                                 key={cat.id}
                                 type="button"
                                 onClick={() => setSelectedCategory(cat.id)}
-                                className={`flex items-center gap-2 p-2 rounded-lg border text-sm transition-all ${selectedCategory === cat.id ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-500 text-gray-700 dark:text-stone-300'}`}
+                                className={`flex items-center gap-3 p-3 rounded-2xl border-2 text-sm transition-all text-left group ${selectedCategory === cat.id ? 'border-panda-500 bg-panda-50 dark:bg-panda-900/20 ring-1 ring-panda-500' : 'border-transparent bg-panda-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-panda-200'}`}
                             >
-                                <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cat.color }}></span>
-                                <span className="truncate">{cat.name}</span>
+                                <span className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-sm" style={{ backgroundColor: cat.color }}>
+                                    {cat.name.charAt(0)}
+                                </span>
+                                <span className={`font-semibold truncate ${selectedCategory === cat.id ? 'text-panda-700 dark:text-panda-300' : ''}`}>{cat.name}</span>
                             </button>
                         ))}
                         <button
@@ -851,57 +887,62 @@ const App: React.FC = () => {
                                 setEditingCategoryId(null);
                                 setIsCategoryModalOpen(true);
                             }}
-                            className="flex items-center justify-center gap-2 p-2 rounded-lg border border-dashed border-gray-300 dark:border-slate-600 text-gray-500 dark:text-stone-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                            className="flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed border-panda-200 dark:border-slate-700 text-slate-400 hover:text-panda-600 hover:border-panda-300 hover:bg-panda-50 transition-all"
                         >
-                            <Plus size={16} />
-                            <span className="text-sm">New Category</span>
+                            <Plus size={18} />
+                            <span className="text-sm font-bold">Create New</span>
                         </button>
                     </div>
                 </div>
             )}
 
             {/* Recurring Toggle */}
-            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700">
-                <div className="flex items-center gap-2">
-                    <Repeat size={18} className="text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-stone-300">Recurring?</span>
+            <div className={`p-4 rounded-2xl transition-all duration-300 border-2 ${isRecurring ? 'bg-panda-50 border-panda-200 dark:bg-slate-800 dark:border-slate-700' : 'bg-white border-transparent'}`}>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-xl ${isRecurring ? 'bg-panda-200 text-panda-700' : 'bg-slate-100 text-slate-400'}`}>
+                            <Repeat size={18} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Recurring Payment</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setIsRecurring(!isRecurring)}
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none ${isRecurring ? 'bg-panda-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                    >
+                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${isRecurring ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </button>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => setIsRecurring(!isRecurring)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isRecurring ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'}`}
-                >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isRecurring ? 'translate-x-6' : 'translate-x-1'}`} />
-                </button>
+
+                {isRecurring && (
+                    <div className="mt-4 animate-in slide-in-from-top-2 fade-in">
+                         <div className="flex gap-2">
+                             {['daily', 'weekly', 'monthly', 'yearly'].map((freq) => (
+                                 <button
+                                    key={freq}
+                                    type="button"
+                                    onClick={() => setRecurrenceFreq(freq as RecurrenceFrequency)}
+                                    className={`flex-1 py-2 rounded-lg text-xs font-bold capitalize transition-all ${recurrenceFreq === freq ? 'bg-white shadow-sm text-panda-600 ring-1 ring-panda-200' : 'text-slate-400 hover:bg-panda-100/50'}`}
+                                 >
+                                     {freq}
+                                 </button>
+                             ))}
+                         </div>
+                    </div>
+                )}
             </div>
 
-            {isRecurring && (
-                <div className="animate-in slide-in-from-top-2">
-                     <label className="block text-sm font-medium text-gray-700 dark:text-stone-300 mb-1">Frequency</label>
-                     <select
-                        value={recurrenceFreq}
-                        onChange={(e) => setRecurrenceFreq(e.target.value as RecurrenceFrequency)}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white appearance-none"
-                     >
-                         <option value="daily">Daily</option>
-                         <option value="weekly">Weekly</option>
-                         <option value="monthly">Monthly</option>
-                         <option value="yearly">Yearly</option>
-                     </select>
-                </div>
-            )}
-
             {editingId && (
-                <div className="flex justify-end pt-2">
-                     <button type="button" onClick={() => handleDeleteTransaction(editingId)} className="text-red-500 text-sm flex items-center gap-1">
-                        <Trash2 size={14} /> Delete Transaction
+                <div className="flex justify-center pt-2">
+                     <button type="button" onClick={() => handleDeleteTransaction(editingId)} className="text-red-400 hover:text-red-500 text-sm font-medium flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors">
+                        <Trash2 size={16} /> Delete this transaction
                      </button>
                 </div>
             )}
 
             <button 
                 type="submit" 
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-colors mt-4 shadow-lg shadow-emerald-500/20"
+                className="w-full bg-gradient-to-r from-panda-600 to-accent-pink hover:from-panda-500 hover:to-pink-400 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-panda-500/30 hover:shadow-panda-500/40 hover:scale-[1.01] active:scale-[0.99]"
             >
                 {editingId ? 'Save Changes' : `Add ${txType === 'expense' ? 'Expense' : 'Income'}`}
             </button>
@@ -909,36 +950,37 @@ const App: React.FC = () => {
       </Modal>
 
       {/* Category Manager Modal */}
-      <Modal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} title={categoryViewMode === 'list' ? "Categories" : (editingCategoryId ? "Edit Category" : "New Category")}>
+      <Modal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} title={categoryViewMode === 'list' ? "Manage Categories" : (editingCategoryId ? "Edit Category" : "New Category")}>
         {categoryViewMode === 'list' ? (
              <div className="flex flex-col h-[400px]">
-                <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
                     {state.categories.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center p-6 text-gray-400 dark:text-slate-500">
-                             <Tag size={48} className="mb-4 opacity-50"/>
-                             <p>No categories yet.</p>
-                             <p className="text-sm">Create one to start tracking!</p>
+                        <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+                             <div className="w-16 h-16 bg-panda-50 rounded-full flex items-center justify-center mb-4">
+                                <Tag size={24} className="opacity-50"/>
+                             </div>
+                             <p className="font-medium">No categories yet.</p>
                         </div>
                     ) : (
                         state.categories.map(cat => (
-                            <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" style={{ backgroundColor: cat.color }}>
+                            <div key={cat.id} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-800 rounded-2xl border border-panda-50 dark:border-slate-700 shadow-sm">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm" style={{ backgroundColor: cat.color }}>
                                         {cat.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="font-semibold text-gray-900 dark:text-white">{cat.name}</span>
+                                        <span className="font-bold text-slate-800 dark:text-white">{cat.name}</span>
                                         {cat.budgetLimit ? (
-                                             <span className="text-xs text-gray-500">Limit: {state.currency}{cat.budgetLimit}</span>
+                                             <span className="text-xs font-medium text-slate-400">Limit: {state.currency}{cat.budgetLimit}</span>
                                         ) : (
-                                            <span className="text-xs text-gray-400">No Limit</span>
+                                            <span className="text-xs font-medium text-slate-400 opacity-60">No Limit</span>
                                         )}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <button 
                                         onClick={() => handleEditCategory(cat)}
-                                        className="p-2 text-gray-400 hover:text-emerald-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
+                                        className="p-2 text-slate-400 hover:text-panda-500 hover:bg-panda-50 rounded-xl transition-all"
                                     >
                                         <Pencil size={18} />
                                     </button>
@@ -949,7 +991,7 @@ const App: React.FC = () => {
                                                 categories: prev.categories.filter(c => c.id !== cat.id)
                                             }));
                                         }}
-                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
+                                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                     >
                                         <Trash2 size={18} />
                                     </button>
@@ -958,7 +1000,7 @@ const App: React.FC = () => {
                         ))
                     )}
                 </div>
-                <div className="pt-4 mt-2 border-t border-gray-100 dark:border-slate-800">
+                <div className="pt-4 mt-2">
                     <button 
                         onClick={() => {
                             setNewCatName('');
@@ -967,7 +1009,7 @@ const App: React.FC = () => {
                             setEditingCategoryId(null);
                             setCategoryViewMode('form');
                         }}
-                        className="w-full bg-gray-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
+                        className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform shadow-lg"
                     >
                         <Plus size={20} />
                         Create New Category
@@ -977,54 +1019,52 @@ const App: React.FC = () => {
         ) : (
             <form onSubmit={handleSaveCategory} className="space-y-6">
                 {/* Live Preview */}
-                <div className="flex justify-center py-4">
-                    <div className="flex items-center gap-3 px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 transform scale-100" style={{ backgroundColor: newCatColor }}>
-                        <span className="text-white font-bold text-lg">{newCatName || 'Category Name'}</span>
-                        {newCatLimit && (
-                            <span className="bg-white/20 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
-                                {state.currency}{newCatLimit}
-                            </span>
-                        )}
+                <div className="flex justify-center py-6">
+                    <div className="flex flex-col items-center gap-3 transform scale-110">
+                        <div className="w-16 h-16 rounded-2xl shadow-lg flex items-center justify-center text-white text-2xl font-bold transition-colors duration-300" style={{ backgroundColor: newCatColor }}>
+                            {newCatName ? newCatName.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <span className="font-bold text-slate-800 dark:text-white">{newCatName || 'Category Name'}</span>
                     </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                     <div>
-                        <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 tracking-wider">Name</label>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Name</label>
                         <input 
                             type="text"
                             required
                             value={newCatName}
                             onChange={(e) => setNewCatName(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white font-medium"
-                            placeholder="e.g., Entertainment"
+                            className="w-full px-4 py-3.5 border-2 border-panda-100 dark:border-slate-700 rounded-2xl focus:border-panda-500 focus:ring-4 focus:ring-panda-500/10 outline-none bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold"
+                            placeholder="e.g., Gaming"
                             autoFocus
                         />
                     </div>
                     
                     <div>
-                        <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2 tracking-wider">Monthly Limit (Optional)</label>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Monthly Limit</label>
                         <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{state.currency}</span>
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{state.currency}</span>
                             <input 
                                 type="number"
                                 value={newCatLimit}
                                 onChange={(e) => setNewCatLimit(e.target.value)}
-                                className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-                                placeholder="0"
+                                className="w-full pl-8 pr-4 py-3.5 border-2 border-panda-100 dark:border-slate-700 rounded-2xl focus:border-panda-500 focus:ring-4 focus:ring-panda-500/10 outline-none bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold"
+                                placeholder="Optional"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-3 tracking-wider">Color</label>
-                        <div className="grid grid-cols-5 gap-3">
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Color Code</label>
+                        <div className="grid grid-cols-6 gap-3">
                             {COLORS.map(color => (
                                 <button
                                     key={color}
                                     type="button"
                                     onClick={() => setNewCatColor(color)}
-                                    className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${newCatColor === color ? 'ring-2 ring-offset-2 ring-gray-400 scale-110 shadow-md' : 'hover:scale-105'}`}
+                                    className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${newCatColor === color ? 'ring-2 ring-offset-2 ring-slate-300 scale-110 shadow-md' : 'hover:scale-105 hover:opacity-80'}`}
                                     style={{ backgroundColor: color }}
                                 >
                                     {newCatColor === color && <Check size={16} className="text-white" />}
@@ -1034,17 +1074,17 @@ const App: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex gap-3 pt-2">
+                <div className="flex gap-3 pt-4">
                     <button 
                         type="button"
                         onClick={handleCancelEditCategory}
-                        className="flex-1 py-3 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+                        className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-2xl hover:bg-slate-200 transition-colors"
                     >
                         Cancel
                     </button>
                     <button 
                         type="submit" 
-                        className="flex-[2] py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20"
+                        className="flex-[2] py-4 bg-panda-600 text-white font-bold rounded-2xl hover:bg-panda-700 transition-colors shadow-lg shadow-panda-500/20"
                     >
                         {editingCategoryId ? 'Save Changes' : 'Create Category'}
                     </button>
@@ -1054,131 +1094,131 @@ const App: React.FC = () => {
       </Modal>
 
       {/* Profile Modal */}
-      <Modal isOpen={isUserModalOpen} onClose={() => setIsUserModalOpen(false)} title="My Profile">
+      <Modal isOpen={isUserModalOpen} onClose={() => setIsUserModalOpen(false)} title="Profile">
             <div className="space-y-6">
+                <div className="flex flex-col items-center mb-6">
+                    <div className="w-20 h-20 bg-panda-100 rounded-full flex items-center justify-center text-4xl mb-3 shadow-inner">
+                        🐼
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">Budget Explorer</h3>
+                </div>
+
                 <div>
-                   <h4 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-3 tracking-wider">Account Settings</h4>
+                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Customization</h4>
                    <button 
                       onClick={() => {
                           setIsUserModalOpen(false);
                           setCategoryViewMode('list');
                           setIsCategoryModalOpen(true);
                       }}
-                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors group"
+                      className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-2xl border border-panda-100 dark:border-slate-700 hover:border-panda-300 transition-all group shadow-sm hover:shadow-md"
                    >
-                       <div className="flex items-center gap-3">
-                           <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-emerald-600 dark:text-emerald-400 shadow-sm">
+                       <div className="flex items-center gap-4">
+                           <div className="p-2.5 bg-panda-50 dark:bg-slate-700 rounded-xl text-panda-600 dark:text-panda-400">
                                 <LayoutGrid size={20} />
                            </div>
                            <div className="text-left">
-                               <p className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Manage Categories</p>
-                               <p className="text-xs text-gray-500 dark:text-stone-400">Add, edit or remove spending categories</p>
+                               <p className="font-bold text-slate-800 dark:text-white">Manage Categories</p>
+                               <p className="text-xs text-slate-500">Edit colors & limits</p>
                            </div>
                        </div>
-                       <ChevronLeft size={18} className="rotate-180 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+                       <ChevronLeft size={20} className="rotate-180 text-slate-300 group-hover:text-panda-500 transition-colors" />
                    </button>
                 </div>
 
-                <div className="border-t border-gray-100 dark:border-slate-800 pt-4">
-                  <h4 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-3 tracking-wider">Currency</h4>
+                <div className="border-t border-panda-100 dark:border-slate-800 pt-6">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Goal Settings</h4>
+                  
+                  <div className="mb-4">
+                    <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Monthly Income Goal</label>
+                    <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{state.currency}</span>
+                        <input 
+                            type="number"
+                            value={state.monthlyIncome}
+                            onChange={(e) => setState(prev => ({ ...prev, monthlyIncome: parseFloat(e.target.value) || 0 }))}
+                            className="w-full pl-8 pr-4 py-3 bg-panda-50 dark:bg-slate-900 border border-transparent focus:border-panda-300 rounded-xl outline-none font-bold text-slate-800 dark:text-white"
+                        />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-4 gap-2">
                     {CURRENCIES.map(c => (
                       <button
                         key={c.code}
                         onClick={() => setState(prev => ({ ...prev, currency: c.symbol }))}
-                        className={`p-2 rounded-lg text-sm border font-medium transition-all ${state.currency === c.symbol ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-stone-400'}`}
+                        className={`p-2 rounded-xl text-xs font-bold transition-all border ${state.currency === c.symbol ? 'border-panda-500 bg-panda-50 text-panda-700' : 'border-slate-200 text-slate-500 hover:border-slate-300'}`}
                       >
                         {c.symbol}
                       </button>
                     ))}
                   </div>
                 </div>
-
-                <div>
-                   <h4 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-3 tracking-wider">Monthly Goal</h4>
-                   <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{state.currency}</span>
-                      <input 
-                          type="number"
-                          value={state.monthlyIncome}
-                          onChange={(e) => setState(prev => ({ ...prev, monthlyIncome: parseFloat(e.target.value) || 0 }))}
-                          className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-                      />
-                   </div>
-                </div>
-
-                <div className="pt-2">
-                     <button 
-                        onClick={() => { setIsUserModalOpen(false); setIsEmailModalOpen(true); }}
-                        className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
-                     >
-                        <Mail size={18} />
-                        Export Data via Email
-                     </button>
-                </div>
             </div>
       </Modal>
 
       {/* Settings Modal (Theme) */}
-      <Modal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} title="Settings">
+      <Modal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} title="Preferences">
           <div className="space-y-6">
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-100 dark:border-slate-800">
-                  <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-200 dark:bg-slate-800 rounded-full text-gray-600 dark:text-gray-300">
+              <div className="flex items-center justify-between p-5 bg-white dark:bg-slate-800 rounded-2xl border border-panda-100 dark:border-slate-700 shadow-sm">
+                  <div className="flex items-center gap-4">
+                      <div className="p-3 bg-panda-50 dark:bg-slate-700 rounded-full text-panda-600 dark:text-panda-400">
                         {state.theme === 'light' ? <Sun size={20} /> : <Moon size={20} />}
                       </div>
                       <div>
-                          <p className="font-medium text-gray-900 dark:text-white">App Theme</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{state.theme === 'light' ? 'Light Mode' : 'Dark Mode'}</p>
+                          <p className="font-bold text-slate-800 dark:text-white">Dark Mode</p>
+                          <p className="text-xs text-slate-500">Switch between light & dark themes</p>
                       </div>
                   </div>
                   <button 
                     onClick={toggleTheme}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${state.theme === 'dark' ? 'bg-emerald-600' : 'bg-gray-300'}`}
+                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${state.theme === 'dark' ? 'bg-panda-600' : 'bg-slate-200'}`}
                   >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${state.theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
+                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${state.theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
                   </button>
               </div>
-
-               <div className="pt-4 border-t border-gray-100 dark:border-slate-800">
-                  <p className="text-xs text-center text-gray-400 dark:text-slate-600">
-                      Vyaya v1.0.1
-                  </p>
+               
+               <div className="pt-6 border-t border-panda-100 dark:border-slate-800 text-center">
+                   <p className="text-xs font-semibold text-panda-300 uppercase tracking-widest">Vyaya Version 2.0</p>
                </div>
           </div>
       </Modal>
 
       {/* Email Report Modal */}
       <Modal isOpen={isEmailModalOpen} onClose={() => setIsEmailModalOpen(false)} title="Export Report">
-         <form onSubmit={handleSendReport} className="space-y-4">
-            <div className="text-center mb-4">
-                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-3 text-emerald-600 dark:text-emerald-400">
+         <form onSubmit={handleSendReport} className="space-y-5">
+            <div className="bg-panda-50 p-6 rounded-3xl text-center">
+                <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-panda-500 shadow-sm">
                     <Mail size={24} />
                 </div>
-                <p className="text-sm text-gray-500 dark:text-stone-400">
-                    Get a PDF report for {currentDate.toLocaleString('default', { month: 'long' })} sent to your inbox.
+                <h4 className="font-bold text-slate-800 mb-1">Monthly Statement</h4>
+                <p className="text-xs text-slate-500">
+                    Send a detailed PDF summary for {currentDate.toLocaleString('default', { month: 'long' })} to your email.
                 </p>
             </div>
             
-            <input 
-                type="email" 
-                required
-                value={emailAddress}
-                onChange={(e) => setEmailAddress(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
-                placeholder="you@example.com"
-            />
+            <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Address</label>
+                <input 
+                    type="email" 
+                    required
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    className="w-full px-4 py-3.5 border-2 border-panda-100 rounded-2xl focus:border-panda-500 outline-none font-medium"
+                    placeholder="panda@example.com"
+                />
+            </div>
 
             <button 
                 type="submit" 
                 disabled={isSendingEmail || isEmailSent}
-                className={`w-full font-bold py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`w-full font-bold py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 ${
                     isEmailSent 
-                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' 
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' 
+                    : 'bg-slate-900 text-white hover:bg-slate-800'
                 }`}
             >
-                {isSendingEmail ? <Loader size={18} className="animate-spin" /> : isEmailSent ? "Sent!" : "Send Report"}
+                {isSendingEmail ? <Loader size={20} className="animate-spin" /> : isEmailSent ? "Sent Successfully!" : "Send Report"}
             </button>
          </form>
       </Modal>
@@ -1189,20 +1229,39 @@ const App: React.FC = () => {
 
 // --- Sub-Components ---
 
-const OverviewCard: React.FC<{ title: string, amount: number, currency: string, extra?: number, color: string, subtext?: string }> = ({ title, amount, currency, extra, color, subtext }) => {
-  const colorClasses = {
-    emerald: 'text-gray-900 dark:text-white', 
-    red: 'text-red-600 dark:text-red-400',
-    blue: 'text-blue-600 dark:text-blue-400'
+const OverviewCard: React.FC<{ title: string, amount: number, currency: string, extra?: number, color: string, subtext?: string, icon: any }> = ({ title, amount, currency, extra, color, subtext, icon }) => {
+  const bgColors = {
+    violet: 'bg-white',
+    teal: 'bg-white', 
+    red: 'bg-white'
   };
+  
+  const textColors = {
+    violet: 'text-panda-600',
+    teal: 'text-emerald-500',
+    red: 'text-rose-500'
+  }
+
+  const iconBg = {
+    violet: 'bg-panda-50 text-panda-500',
+    teal: 'bg-emerald-50 text-emerald-500',
+    red: 'bg-rose-50 text-rose-500'
+  }
 
   return (
-     <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-emerald-500/10 flex flex-col transition-colors">
-        <span className="text-xs text-gray-500 dark:text-stone-400 font-medium mb-1">{title}</span>
-        <span className={`text-xl font-bold ${colorClasses[color as keyof typeof colorClasses] || 'text-gray-900 dark:text-white'}`}>
-          {currency}{amount.toLocaleString()}
-        </span>
-        {subtext && <span className="text-[10px] text-gray-400 mt-2">{subtext}</span>}
+     <div className={`${bgColors[color as keyof typeof bgColors] || 'bg-white'} dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-panda-100 dark:border-slate-800 flex flex-col justify-between hover:border-panda-200 transition-all`}>
+        <div className="flex justify-between items-start mb-2">
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{title}</span>
+            <div className={`p-2 rounded-lg ${iconBg[color as keyof typeof iconBg]}`}>
+                {icon}
+            </div>
+        </div>
+        <div>
+            <span className={`text-2xl font-black tracking-tight ${textColors[color as keyof typeof textColors] || 'text-slate-800'} dark:text-white`}>
+            {currency}{amount.toLocaleString()}
+            </span>
+            {subtext && <span className="block text-[10px] font-bold text-slate-400 mt-1">{subtext}</span>}
+        </div>
       </div>
   );
 }
@@ -1226,15 +1285,18 @@ const OnboardingView: React.FC<{
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 text-gray-900 dark:text-white transition-colors">
+        <div className="min-h-screen bg-panda-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 text-slate-800 dark:text-white transition-colors">
             <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold mb-2 text-emerald-600 dark:text-emerald-400">Welcome to Vyaya</h1>
-                    <p className="text-gray-500 dark:text-stone-400 text-sm">Let's set up your financial peace of mind.</p>
+                <div className="text-center mb-10">
+                    <div className="w-24 h-24 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl shadow-panda-500/20 text-5xl animate-bounce-slow">
+                        🐼
+                    </div>
+                    <h1 className="text-3xl font-black mb-2 text-slate-900 dark:text-white tracking-tight">Welcome to Vyaya</h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">Your playful financial companion.</p>
                 </div>
 
                 {step === 1 ? (
-                    <div className="space-y-4 animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="space-y-4 animate-in slide-in-from-bottom-8 duration-700">
                         <div className="grid grid-cols-1 gap-3">
                             {TEMPLATES.map(t => {
                                 const Icon = t.icon;
@@ -1246,15 +1308,15 @@ const OnboardingView: React.FC<{
                                             setSelectedTemplate(t.id);
                                             onSelectTemplate(t.id);
                                         }}
-                                        className={`p-4 rounded-xl border text-left transition-all ${isSelected ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-600 dark:border-emerald-500' : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300'}`}
+                                        className={`p-5 rounded-2xl border-2 text-left transition-all duration-300 ${isSelected ? 'border-panda-500 bg-white shadow-lg ring-1 ring-panda-500 transform scale-[1.02]' : 'border-transparent bg-white/60 dark:bg-slate-900 hover:bg-white hover:shadow-md'}`}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isSelected ? 'bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-200' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-stone-300'}`}>
-                                                <Icon size={16} />
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isSelected ? 'bg-panda-100 text-panda-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                                                <Icon size={20} />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-sm dark:text-stone-100">{t.name}</h3>
-                                                <p className="text-xs text-gray-500 dark:text-stone-400">{t.description}</p>
+                                                <h3 className="font-bold text-sm text-slate-900 dark:text-white">{t.name}</h3>
+                                                <p className="text-xs text-slate-500">{t.description}</p>
                                             </div>
                                         </div>
                                     </button>
@@ -1263,15 +1325,15 @@ const OnboardingView: React.FC<{
                         </div>
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-emerald-500/30 animate-in slide-in-from-right-4 duration-500">
-                         <div className="mb-6">
-                            <h2 className="text-sm font-semibold mb-2 dark:text-stone-200">Select Currency</h2>
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-panda-900/5 animate-in slide-in-from-right-8 duration-500">
+                         <div className="mb-8">
+                            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Currency</h2>
                             <div className="flex gap-2 flex-wrap">
                                 {CURRENCIES.map(c => (
                                     <button
                                         key={c.code}
                                         onClick={() => setCurrency(c.symbol)}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${currency === c.symbol ? 'bg-emerald-600 text-white border-emerald-600' : 'border-gray-300 dark:border-slate-700 text-gray-600 dark:text-stone-400'}`}
+                                        className={`px-3 py-2 rounded-xl text-xs font-bold border-2 transition-all ${currency === c.symbol ? 'bg-panda-500 text-white border-panda-500' : 'border-slate-100 bg-slate-50 text-slate-500'}`}
                                     >
                                         {c.code}
                                     </button>
@@ -1279,14 +1341,14 @@ const OnboardingView: React.FC<{
                             </div>
                         </div>
 
-                        <h2 className="text-lg font-semibold mb-6 dark:text-stone-200">Monthly Income Goal?</h2>
+                        <h2 className="text-xl font-bold mb-6 text-slate-900 dark:text-white">Monthly Income Goal</h2>
                         <div className="relative mb-4">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl font-medium">{currency}</span>
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-300 text-3xl font-black">{currency}</span>
                             <input 
                                 type="number" 
                                 value={income}
                                 onChange={(e) => setIncome(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 text-2xl font-bold border-b-2 border-gray-200 dark:border-slate-700 bg-transparent focus:border-emerald-600 outline-none transition-colors dark:text-white"
+                                className="w-full pl-8 pr-4 py-2 text-4xl font-black border-b-2 border-slate-100 bg-transparent focus:border-panda-500 outline-none transition-colors text-slate-900 dark:text-white placeholder-slate-200"
                                 placeholder="0"
                                 autoFocus
                             />
@@ -1294,14 +1356,14 @@ const OnboardingView: React.FC<{
                     </div>
                 )}
 
-                <div className="mt-8">
+                <div className="mt-10">
                     <button
                         onClick={handleNext}
                         disabled={step === 1 ? !selectedTemplate : !income}
-                        className="w-full bg-gray-900 dark:bg-emerald-600 text-white py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className="w-full bg-slate-900 dark:bg-panda-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:scale-[1.02] disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed transition-all shadow-xl"
                     >
-                        {step === 1 ? 'Next Step' : 'Launch Dashboard'}
-                        <ArrowRight size={18} />
+                        {step === 1 ? 'Continue' : 'Start Budgeting'}
+                        <ArrowRight size={20} />
                     </button>
                 </div>
             </div>

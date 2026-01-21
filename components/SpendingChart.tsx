@@ -22,7 +22,7 @@ export const SpendingChart: React.FC<SpendingChartProps> = ({ transactions, cate
 
   if (data.length === 0) {
     return (
-      <div className="h-64 flex flex-col items-center justify-center text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-900/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-slate-700">
+      <div className="h-64 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 bg-panda-50/50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-panda-100 dark:border-slate-800">
         <p>No expenses for this period.</p>
         <p className="text-sm opacity-75">Add a transaction to see the breakdown.</p>
       </div>
@@ -37,8 +37,8 @@ export const SpendingChart: React.FC<SpendingChartProps> = ({ transactions, cate
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={80}
+            innerRadius={65}
+            outerRadius={85}
             paddingAngle={5}
             dataKey="value"
           >
@@ -49,14 +49,21 @@ export const SpendingChart: React.FC<SpendingChartProps> = ({ transactions, cate
           <Tooltip 
             formatter={(value: number) => [`${value.toFixed(2)}`, 'Spent']}
             contentStyle={{ 
-              borderRadius: '12px', 
+              borderRadius: '16px', 
               border: 'none', 
-              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              color: '#1e293b'
+              color: '#1e293b',
+              padding: '12px'
             }}
+            itemStyle={{ color: '#6d28d9', fontWeight: 600 }}
           />
-          <Legend verticalAlign="bottom" height={36} iconType="circle" />
+          <Legend 
+            verticalAlign="bottom" 
+            height={36} 
+            iconType="circle"
+            formatter={(value, entry: any) => <span className="text-xs font-medium text-slate-600 dark:text-slate-400 ml-1">{value}</span>} 
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>

@@ -2,14 +2,14 @@ import { BudgetTemplate, CurrencyOption } from './types';
 import { GraduationCap, Briefcase, Home, Sunset, Zap, ShoppingCart, Coffee, Car, Film, HeartPulse } from 'lucide-react';
 
 export const COLORS = [
-  '#3b82f6', // blue-500
-  '#ef4444', // red-500
-  '#10b981', // emerald-500
-  '#f59e0b', // amber-500
-  '#8b5cf6', // violet-500
-  '#ec4899', // pink-500
-  '#06b6d4', // cyan-500
-  '#f97316', // orange-500
+  '#8b5cf6', // Violet
+  '#ec4899', // Pink
+  '#06b6d4', // Cyan
+  '#f59e0b', // Amber
+  '#10b981', // Emerald
+  '#f43f5e', // Rose
+  '#3b82f6', // Blue
+  '#6366f1', // Indigo
 ];
 
 export const CURRENCIES: CurrencyOption[] = [
@@ -29,11 +29,11 @@ export const TEMPLATES: BudgetTemplate[] = [
     description: 'Focused on essentials, books, and social life.',
     icon: GraduationCap,
     defaultCategories: [
-      { name: 'Rent/Dorm', color: '#3b82f6', icon: 'Home' },
-      { name: 'Food & Dining', color: '#10b981', icon: 'Coffee' },
-      { name: 'Transportation', color: '#f59e0b', icon: 'Car' },
-      { name: 'Entertainment', color: '#8b5cf6', icon: 'Film' },
-      { name: 'Books & Supplies', color: '#ef4444', icon: 'Briefcase' },
+      { name: 'Rent/Dorm', color: '#8b5cf6', icon: 'Home' },
+      { name: 'Food & Dining', color: '#ec4899', icon: 'Coffee' },
+      { name: 'Transportation', color: '#06b6d4', icon: 'Car' },
+      { name: 'Entertainment', color: '#f59e0b', icon: 'Film' },
+      { name: 'Books & Supplies', color: '#10b981', icon: 'Briefcase' },
     ]
   },
   {
@@ -42,11 +42,11 @@ export const TEMPLATES: BudgetTemplate[] = [
     description: 'Balancing career growth, loans, and lifestyle.',
     icon: Briefcase,
     defaultCategories: [
-      { name: 'Rent', color: '#3b82f6', icon: 'Home' },
+      { name: 'Rent', color: '#8b5cf6', icon: 'Home' },
       { name: 'Groceries', color: '#10b981', icon: 'ShoppingCart' },
       { name: 'Utilities', color: '#f59e0b', icon: 'Zap' },
       { name: 'Dining Out', color: '#ec4899', icon: 'Coffee' },
-      { name: 'Student Loans', color: '#ef4444', icon: 'Briefcase' },
+      { name: 'Student Loans', color: '#f43f5e', icon: 'Briefcase' },
       { name: 'Travel', color: '#06b6d4', icon: 'Car' },
     ]
   },
@@ -56,12 +56,12 @@ export const TEMPLATES: BudgetTemplate[] = [
     description: 'Comprehensive tracking for household needs.',
     icon: Home,
     defaultCategories: [
-      { name: 'Mortgage/Rent', color: '#3b82f6', icon: 'Home' },
+      { name: 'Mortgage/Rent', color: '#8b5cf6', icon: 'Home' },
       { name: 'Groceries', color: '#10b981', icon: 'ShoppingCart' },
       { name: 'Utilities', color: '#f59e0b', icon: 'Zap' },
       { name: 'Childcare', color: '#ec4899', icon: 'HeartPulse' },
-      { name: 'Healthcare', color: '#ef4444', icon: 'HeartPulse' },
-      { name: 'Insurance', color: '#8b5cf6', icon: 'Briefcase' },
+      { name: 'Healthcare', color: '#f43f5e', icon: 'HeartPulse' },
+      { name: 'Insurance', color: '#6366f1', icon: 'Briefcase' },
     ]
   },
   {
@@ -70,8 +70,8 @@ export const TEMPLATES: BudgetTemplate[] = [
     description: 'Simple tracking for enjoyment and health.',
     icon: Sunset,
     defaultCategories: [
-      { name: 'Housing', color: '#3b82f6', icon: 'Home' },
-      { name: 'Healthcare', color: '#ef4444', icon: 'HeartPulse' },
+      { name: 'Housing', color: '#8b5cf6', icon: 'Home' },
+      { name: 'Healthcare', color: '#f43f5e', icon: 'HeartPulse' },
       { name: 'Groceries', color: '#10b981', icon: 'ShoppingCart' },
       { name: 'Travel/Leisure', color: '#f59e0b', icon: 'Car' },
       { name: 'Gifts', color: '#ec4899', icon: 'HeartPulse' },
