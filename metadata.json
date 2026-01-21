@@ -1,5 +1,7 @@
 {
-  "name": "Copy of ZenBudget",
+  "name": "Vyaya",
   "description": "A visually intuitive, template-based budget tracker powered by Gemini AI to help users of all ages master their finances.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

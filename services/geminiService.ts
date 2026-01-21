@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { Transaction, Category } from '../types';
 
 const apiKey = process.env.API_KEY || '';
@@ -27,7 +27,7 @@ export const getFinancialAdvice = async (
   }).join(', ');
 
   const prompt = `
-    You are a friendly, encouraging financial buddy (a cute panda character) for a budgeting app called ZenBudget.
+    You are a friendly, encouraging financial buddy (a cute panda character) for a budgeting app called Vyaya.
     
     Here is the user's current month snapshot:
     - Monthly Income Goal: ${currency}${income}
@@ -77,3 +77,66 @@ export const suggestCategoryFromText = async (description: string, categories: C
         return null;
     }
 }
+
+export const parseTransactionFromText = async (
+  text: string, 
+  categories: Category[], 
+  currency: string
+): Promise<{
+  amount: number;
+  description: string;
+  categoryId: string | null;
+  type: 'expense' | 'income';
+} | null> => {
+  if (!ai) return null;
+
+  const categoryNames = categories.map(c => c.name).join(', ');
+  
+  const prompt = `
+    Analyze this spoken transaction text: "${text}".
+    Currency context: ${currency}.
+    Available Categories: ${categoryNames}.
+    
+    Extract the following details:
+    - Amount (number).
+    - Description (short string summary).
+    - Category Name (Must match one of the Available Categories closely, or "Miscellaneous" if undefined).
+    - Type ("expense" or "income").
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            amount: { type: Type.NUMBER },
+            description: { type: Type.STRING },
+            categoryName: { type: Type.STRING },
+            type: { type: Type.STRING, enum: ["expense", "income"] }
+          }
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || '{}');
+    
+    // Find category ID from name
+    const category = categories.find(c => 
+      c.name.toLowerCase() === (result.categoryName || '').toLowerCase()
+    );
+    
+    return {
+      amount: result.amount || 0,
+      description: result.description || text,
+      categoryId: category ? category.id : null,
+      type: result.type === 'income' ? 'income' : 'expense'
+    };
+  } catch (error) {
+    console.error("Gemini Parse Error:", error);
+    return null;
+  }
+};

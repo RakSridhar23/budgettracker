@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZenBudget</title>
+    <title>Vyaya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -14,6 +14,13 @@
               slate: {
                 850: '#151f32',
                 900: '#0f172a',
+                950: '#020617',
+              },
+              stone: {
+                200: '#e7e5e4',
+              },
+              emerald: {
+                450: '#10b981', // Custom accent if needed
               }
             }
           }
@@ -34,14 +41,14 @@
         background: transparent; 
       }
       ::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
+        background: #34d399; /* Emerald 400 */
         border-radius: 4px;
       }
       .dark ::-webkit-scrollbar-thumb {
-        background: #475569; 
+        background: #059669; /* Emerald 600 */
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
+        background: #10b981; 
       }
     </style>
   <script type="importmap">
@@ -60,7 +67,7 @@
 }
 </script>
 </head>
-  <body class="bg-gray-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 transition-colors duration-300">
+  <body class="bg-slate-950 text-stone-200 transition-colors duration-300">
     <div id="root"></div>
   </body>
 </html>
