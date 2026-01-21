@@ -29,7 +29,8 @@ import {
   Palette,
   Tag,
   LayoutGrid,
-  Bell
+  Bell,
+  RefreshCw
 } from 'lucide-react';
 import { TEMPLATES, COLORS, CURRENCIES } from './constants';
 import { AppState, Category, Transaction, RecurrenceFrequency } from './types';
@@ -258,6 +259,13 @@ const App: React.FC = () => {
     }));
     handleConfetti();
   };
+
+  const handleResetApp = () => {
+    if (confirm("This will delete all transactions and categories. Are you sure you want to start fresh?")) {
+        localStorage.removeItem('vyayaState');
+        window.location.reload();
+    }
+  }
 
   const handleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -599,28 +607,26 @@ const App: React.FC = () => {
             </button>
         </div>
 
-        {/* Panda AI Insight Banner */}
-        <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-panda-600 to-accent-pink p-1 shadow-lg shadow-panda-500/20 transition-all hover:shadow-panda-500/30">
-          <div className="relative h-full w-full rounded-[20px] bg-white dark:bg-slate-900 p-5">
-             <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity">
-                <span className="text-9xl grayscale">🐼</span>
-             </div>
-             
-             <div className="relative z-10 flex gap-4 items-start">
-                <div className="w-12 h-12 shrink-0 bg-panda-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-2xl border-2 border-panda-100 dark:border-slate-700">
+        {/* Compact Panda AI Insight Pill - Adjusted to Fit Text */}
+        <div className="flex justify-center w-full">
+            <div className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-panda-100 dark:border-slate-800 p-2 pr-4 shadow-sm hover:shadow-md transition-all max-w-md w-full mx-auto">
+              <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 shrink-0 bg-panda-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-lg border border-panda-100 dark:border-slate-700">
                     🐼
-                </div>
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-black uppercase text-panda-500 tracking-wider">Insight</span>
+                 </div>
+                 
+                 <div className="flex-1 min-w-0 py-1">
+                    <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] font-black uppercase text-panda-500 tracking-wider">Insight</span>
                         {isLoadingAdvice && <Loader size={10} className="animate-spin text-panda-400"/>}
                     </div>
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">
-                        "{isLoadingAdvice ? "Munching bamboo, calculating figures..." : (aiAdvice || "Hey! I'm your panda pal. Add some expenses so I can help you save!")}"
+                    {/* Removed line-clamp-2 to let text fit naturally */}
+                    <p className="text-xs font-medium text-slate-600 dark:text-slate-300 leading-snug">
+                        {isLoadingAdvice ? "Munching bamboo..." : (aiAdvice || "Add expenses to get tips!")}
                     </p>
-                </div>
-             </div>
-          </div>
+                 </div>
+              </div>
+            </div>
         </div>
 
         {/* Financial Overview Cards */}
@@ -1130,7 +1136,7 @@ const App: React.FC = () => {
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Goal Settings</h4>
                   
                   <div className="mb-4">
-                    <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Monthly Income Goal</label>
+                    <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Monthly Income</label>
                     <div className="relative">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{state.currency}</span>
                         <input 
@@ -1178,8 +1184,15 @@ const App: React.FC = () => {
                   </button>
               </div>
                
-               <div className="pt-6 border-t border-panda-100 dark:border-slate-800 text-center">
-                   <p className="text-xs font-semibold text-panda-300 uppercase tracking-widest">Vyaya Version 2.0</p>
+               <div className="pt-6 border-t border-panda-100 dark:border-slate-800 text-center space-y-4">
+                   <button 
+                        onClick={handleResetApp}
+                        className="text-xs font-bold text-red-400 hover:text-red-500 uppercase tracking-widest hover:underline flex items-center justify-center gap-2 mx-auto"
+                   >
+                       <RefreshCw size={12} />
+                       Reset App Data
+                   </button>
+                   <p className="text-[10px] font-semibold text-panda-200 uppercase tracking-widest">Vyaya Version 2.0</p>
                </div>
           </div>
       </Modal>
@@ -1341,7 +1354,7 @@ const OnboardingView: React.FC<{
                             </div>
                         </div>
 
-                        <h2 className="text-xl font-bold mb-6 text-slate-900 dark:text-white">Monthly Income Goal</h2>
+                        <h2 className="text-xl font-bold mb-6 text-slate-900 dark:text-white">Monthly Income</h2>
                         <div className="relative mb-4">
                             <span className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-300 text-3xl font-black">{currency}</span>
                             <input 
