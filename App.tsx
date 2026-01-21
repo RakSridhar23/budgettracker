@@ -675,12 +675,19 @@ const App: React.FC = () => {
                                 else if (percent > 85) progressColor = '#f59e0b'; // Amber
                             }
 
+                            const incomePercentage = state.monthlyIncome > 0 ? (spent / state.monthlyIncome) * 100 : 0;
+
                             if (spent === 0 && !hasLimit) return null;
                             
                             return (
                                 <div key={cat.id}>
-                                    <div className="flex justify-between text-xs mb-1">
-                                        <span className="text-gray-700 dark:text-stone-300 font-medium">{cat.name}</span>
+                                    <div className="flex justify-between items-end text-xs mb-1">
+                                         <div>
+                                            <span className="text-gray-700 dark:text-stone-300 font-medium block">{cat.name}</span>
+                                            <span className="text-[10px] text-gray-400 dark:text-stone-500 font-medium">
+                                                {incomePercentage < 0.1 && spent > 0 ? '< 0.1' : incomePercentage.toFixed(1)}% of income
+                                            </span>
+                                        </div>
                                         <div className="text-right">
                                             <span className="text-gray-900 dark:text-white font-bold">{state.currency}{spent.toLocaleString()}</span>
                                             {hasLimit && (
