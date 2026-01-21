@@ -53,6 +53,7 @@ const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem('vyayaState');
     const defaultState: AppState = {
+      isLoggedIn: false,
       hasOnboarded: false,
       monthlyIncome: 0,
       currency: '$',
@@ -260,11 +261,13 @@ const App: React.FC = () => {
     handleConfetti();
   };
 
-  const handleResetApp = () => {
-    if (confirm("This will delete all transactions and categories. Are you sure you want to start fresh?")) {
-        localStorage.removeItem('vyayaState');
-        window.location.reload();
-    }
+  const handleLogin = (email: string) => {
+    setState(prev => ({ ...prev, isLoggedIn: true, userEmail: email }));
+  };
+
+  const handleLogout = () => {
+    setState(prev => ({ ...prev, isLoggedIn: false }));
+    setIsSettingsModalOpen(false);
   }
 
   const handleVoiceInput = () => {
@@ -532,6 +535,10 @@ const App: React.FC = () => {
   };
 
   // --- Render Views ---
+
+  if (!state.isLoggedIn) {
+      return <LoginView onLogin={handleLogin} />;
+  }
 
   if (!state.hasOnboarded) {
     return (
@@ -1186,11 +1193,11 @@ const App: React.FC = () => {
                
                <div className="pt-6 border-t border-panda-100 dark:border-slate-800 text-center space-y-4">
                    <button 
-                        onClick={handleResetApp}
+                        onClick={handleLogout}
                         className="text-xs font-bold text-red-400 hover:text-red-500 uppercase tracking-widest hover:underline flex items-center justify-center gap-2 mx-auto"
                    >
-                       <RefreshCw size={12} />
-                       Reset App Data
+                       <LogOut size={12} />
+                       Exit App
                    </button>
                    <p className="text-[10px] font-semibold text-panda-200 uppercase tracking-widest">Vyaya Version 2.0</p>
                </div>
@@ -1241,6 +1248,62 @@ const App: React.FC = () => {
 };
 
 // --- Sub-Components ---
+
+const LoginView: React.FC<{ onLogin: (email: string) => void }> = ({ onLogin }) => {
+    const [email, setEmail] = useState('');
+    
+    return (
+        <div className="flex flex-col h-screen bg-panda-100 dark:bg-slate-950 font-sans relative overflow-hidden">
+            {/* Top Section - 60% */}
+            <div className="h-[60%] flex items-center justify-center relative p-8 bg-panda-200/50">
+                <div className="relative w-full h-full flex items-center justify-center">
+                    <div className="text-[120px] md:text-[180px] leading-none filter drop-shadow-2xl animate-bounce-slow transform hover:scale-110 transition-transform cursor-pointer">
+                        🐼
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Section - 40% */}
+            <div className="h-[40%] bg-white dark:bg-slate-900 w-full rounded-t-[3rem] px-8 pt-10 pb-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] relative z-20 flex flex-col">
+                <div className="max-w-md mx-auto w-full flex flex-col h-full">
+                    <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-8">Login</h2>
+                    
+                    <form 
+                        onSubmit={(e) => { 
+                            e.preventDefault(); 
+                            if(email) onLogin(email); 
+                        }}
+                        className="space-y-6"
+                    >
+                        <div>
+                             <input 
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-5 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-slate-900 dark:focus:border-white focus:ring-0 outline-none transition-all font-medium text-slate-800 dark:text-white placeholder-slate-400"
+                                placeholder="username@email.com"
+                             />
+                        </div>
+
+                        <button 
+                            type="submit"
+                            className="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-4 rounded-full shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                        >
+                            Login
+                        </button>
+                    </form>
+
+                    <div className="mt-auto pb-4 text-center">
+                         <p className="text-sm font-medium text-slate-500">
+                            You don't have an account? <button onClick={() => alert("Sign up flow coming soon!")} className="text-blue-600 dark:text-blue-400 font-bold hover:underline">Sign up</button>
+                         </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const OverviewCard: React.FC<{ title: string, amount: number, currency: string, extra?: number, color: string, subtext?: string, icon: any }> = ({ title, amount, currency, extra, color, subtext, icon }) => {
   const bgColors = {

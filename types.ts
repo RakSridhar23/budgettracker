@@ -29,6 +29,7 @@ export interface BudgetTemplate {
 }
 
 export interface AppState {
+  isLoggedIn: boolean;
   hasOnboarded: boolean;
   monthlyIncome: number;
   currency: string;
