@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { Transaction, Category } from '../types';
+import { Transaction, Category, RecurrenceFrequency } from '../types';
 
 const apiKey = process.env.API_KEY || '';
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
@@ -88,6 +88,8 @@ export const parseTransactionFromText = async (
   categoryId: string | null;
   newCategoryName: string | null;
   type: 'expense' | 'income';
+  isRecurring: boolean;
+  recurrence: RecurrenceFrequency;
 } | null> => {
   if (!ai) return null;
 
@@ -98,17 +100,22 @@ export const parseTransactionFromText = async (
     Currency context: ${currency}.
     Available Categories: ${categoryNames}.
     
-    Your goal is to extract transaction details and determine the category.
+    Your goal is to extract transaction details, determine the category, and detect if it is a recurring payment.
     
     Logic for Category:
     1. If the input matches the *intent* of an existing category (e.g. "housing" matches "Rent", "latte" matches "Coffee"), use the Exact Existing Category Name.
     2. If the input does NOT fit any existing category well, or the user explicitly names a new one (e.g. "Spent 500 on Miscellaneous"), suggest a NEW short category name (e.g. "Miscellaneous").
+    
+    Logic for Recurrence:
+    - Look for keywords like "every month", "monthly", "weekly", "yearly", "recurring", "subscription".
+    - If found, set isRecurring to true and set the frequency (daily, weekly, monthly, yearly). Default to 'monthly' if vague.
     
     Extract:
     - Amount (number).
     - Description (short string summary).
     - Category Name (Existing or New).
     - Type ("expense" or "income").
+    - Recurrence info.
   `;
 
   try {
@@ -126,6 +133,11 @@ export const parseTransactionFromText = async (
             type: { 
               type: Type.STRING,
               description: "Must be exactly 'expense' or 'income'" 
+            },
+            isRecurring: { type: Type.BOOLEAN },
+            recurrence: { 
+                type: Type.STRING, 
+                description: "one of: daily, weekly, monthly, yearly. defaults to monthly if unsure." 
             }
           }
         }
@@ -138,13 +150,18 @@ export const parseTransactionFromText = async (
     const category = categories.find(c => 
       c.name.toLowerCase() === (result.categoryName || '').toLowerCase()
     );
+
+    const validFrequencies = ['daily', 'weekly', 'monthly', 'yearly'];
+    const recurrenceFreq = validFrequencies.includes(result.recurrence) ? result.recurrence : 'monthly';
     
     return {
       amount: result.amount || 0,
       description: result.description || text,
       categoryId: category ? category.id : null,
       newCategoryName: category ? null : (result.categoryName || null),
-      type: result.type === 'income' ? 'income' : 'expense'
+      type: result.type === 'income' ? 'income' : 'expense',
+      isRecurring: !!result.isRecurring,
+      recurrence: recurrenceFreq as RecurrenceFrequency
     };
   } catch (error) {
     console.error("Gemini Parse Error:", error);

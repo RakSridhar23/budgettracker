@@ -290,6 +290,10 @@ const App: React.FC = () => {
         setAmount(parsedData.amount.toString());
         setDescription(parsedData.description);
         setTxType(parsedData.type);
+        setIsRecurring(parsedData.isRecurring);
+        if (parsedData.recurrence) {
+            setRecurrenceFreq(parsedData.recurrence);
+        }
         
         let targetCategoryId = '';
 
@@ -846,6 +850,37 @@ const App: React.FC = () => {
                             <span className="text-sm">New Category</span>
                         </button>
                     </div>
+                </div>
+            )}
+
+            {/* Recurring Toggle */}
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700">
+                <div className="flex items-center gap-2">
+                    <Repeat size={18} className="text-gray-500" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-stone-300">Recurring?</span>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => setIsRecurring(!isRecurring)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isRecurring ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'}`}
+                >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isRecurring ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
+            </div>
+
+            {isRecurring && (
+                <div className="animate-in slide-in-from-top-2">
+                     <label className="block text-sm font-medium text-gray-700 dark:text-stone-300 mb-1">Frequency</label>
+                     <select
+                        value={recurrenceFreq}
+                        onChange={(e) => setRecurrenceFreq(e.target.value as RecurrenceFrequency)}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white appearance-none"
+                     >
+                         <option value="daily">Daily</option>
+                         <option value="weekly">Weekly</option>
+                         <option value="monthly">Monthly</option>
+                         <option value="yearly">Yearly</option>
+                     </select>
                 </div>
             )}
 
