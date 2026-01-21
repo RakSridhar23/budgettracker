@@ -86,6 +86,7 @@ export const parseTransactionFromText = async (
   amount: number;
   description: string;
   categoryId: string | null;
+  newCategoryName: string | null;
   type: 'expense' | 'income';
 } | null> => {
   if (!ai) return null;
@@ -97,10 +98,16 @@ export const parseTransactionFromText = async (
     Currency context: ${currency}.
     Available Categories: ${categoryNames}.
     
-    Extract the following details:
+    Your goal is to extract transaction details and determine the category.
+    
+    Logic for Category:
+    1. If the input matches the *intent* of an existing category (e.g. "housing" matches "Rent", "latte" matches "Coffee"), use the Exact Existing Category Name.
+    2. If the input does NOT fit any existing category well, or the user explicitly names a new one (e.g. "Spent 500 on Miscellaneous"), suggest a NEW short category name (e.g. "Miscellaneous").
+    
+    Extract:
     - Amount (number).
     - Description (short string summary).
-    - Category Name (Must match one of the Available Categories closely, or "Miscellaneous" if undefined).
+    - Category Name (Existing or New).
     - Type ("expense" or "income").
   `;
 
@@ -115,7 +122,7 @@ export const parseTransactionFromText = async (
           properties: {
             amount: { type: Type.NUMBER },
             description: { type: Type.STRING },
-            categoryName: { type: Type.STRING },
+            categoryName: { type: Type.STRING, description: "The determined category name" },
             type: { 
               type: Type.STRING,
               description: "Must be exactly 'expense' or 'income'" 
@@ -127,7 +134,7 @@ export const parseTransactionFromText = async (
 
     const result = JSON.parse(response.text || '{}');
     
-    // Find category ID from name
+    // Check if the returned name matches an existing category
     const category = categories.find(c => 
       c.name.toLowerCase() === (result.categoryName || '').toLowerCase()
     );
@@ -136,6 +143,7 @@ export const parseTransactionFromText = async (
       amount: result.amount || 0,
       description: result.description || text,
       categoryId: category ? category.id : null,
+      newCategoryName: category ? null : (result.categoryName || null),
       type: result.type === 'income' ? 'income' : 'expense'
     };
   } catch (error) {

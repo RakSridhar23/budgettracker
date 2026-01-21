@@ -290,11 +290,38 @@ const App: React.FC = () => {
         setAmount(parsedData.amount.toString());
         setDescription(parsedData.description);
         setTxType(parsedData.type);
+        
+        let targetCategoryId = '';
+
         if (parsedData.categoryId) {
-          setSelectedCategory(parsedData.categoryId);
+          // Exact match found
+          targetCategoryId = parsedData.categoryId;
+        } else if (parsedData.newCategoryName && parsedData.type === 'expense') {
+          // AI suggested a new category that doesn't exist
+          const newId = generateId();
+          const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+          
+          const newCat: Category = {
+            id: newId,
+            name: parsedData.newCategoryName,
+            color: randomColor,
+            icon: 'Tag',
+            budgetLimit: 0
+          };
+
+          // Optimistically update state to include new category
+          setState(prev => ({
+            ...prev,
+            categories: [...prev.categories, newCat]
+          }));
+          
+          targetCategoryId = newId;
         } else {
-           setSelectedCategory(state.categories[0]?.id || '');
+           // Fallback
+           targetCategoryId = state.categories[0]?.id || '';
         }
+
+        setSelectedCategory(targetCategoryId);
         setIsAddModalOpen(true);
       } else {
         alert("Could not understand the transaction. Please try again.");
