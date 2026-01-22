@@ -1253,18 +1253,19 @@ const LoginView: React.FC<{ onLogin: (email: string) => void }> = ({ onLogin }) 
     const [email, setEmail] = useState('');
     
     return (
-        <div className="flex flex-col h-screen bg-panda-100 dark:bg-slate-950 font-sans relative overflow-hidden">
+        <div className="flex flex-col h-screen bg-white dark:bg-slate-950 font-sans relative overflow-hidden">
             {/* Top Section - 60% */}
-            <div className="h-[60%] flex items-center justify-center relative p-8 bg-panda-200/50">
+            <div className="h-[60%] flex items-center justify-center relative p-8 bg-white dark:bg-slate-900">
                 <div className="relative w-full h-full flex items-center justify-center">
-                    <div className="text-[120px] md:text-[180px] leading-none filter drop-shadow-2xl animate-bounce-slow transform hover:scale-110 transition-transform cursor-pointer">
-                        🐼
-                    </div>
+                    {/* Calligraphy Text */}
+                    <h1 className="text-[100px] md:text-[140px] leading-none text-panda-400 dark:text-panda-300 font-['Great_Vibes'] drop-shadow-sm animate-in fade-in zoom-in duration-1000">
+                        Vyaya
+                    </h1>
                 </div>
             </div>
 
             {/* Bottom Section - 40% */}
-            <div className="h-[40%] bg-white dark:bg-slate-900 w-full rounded-t-[3rem] px-8 pt-10 pb-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] relative z-20 flex flex-col">
+            <div className="h-[40%] bg-white dark:bg-slate-900 w-full rounded-t-[3rem] px-8 pt-10 pb-6 shadow-[0_-10px_60px_-15px_rgba(0,0,0,0.1)] ring-1 ring-black/5 relative z-20 flex flex-col">
                 <div className="max-w-md mx-auto w-full flex flex-col h-full">
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-8">Login</h2>
                     
