@@ -30,7 +30,8 @@ import {
   Tag,
   LayoutGrid,
   Bell,
-  RefreshCw
+  RefreshCw,
+  Coins
 } from 'lucide-react';
 import { TEMPLATES, COLORS, CURRENCIES } from './constants';
 import { AppState, Category, Transaction, RecurrenceFrequency } from './types';
@@ -1255,17 +1256,43 @@ const LoginView: React.FC<{ onLogin: (email: string) => void }> = ({ onLogin }) 
     return (
         <div className="flex flex-col h-screen bg-white dark:bg-slate-950 font-sans relative overflow-hidden">
             {/* Top Section - 60% */}
-            <div className="h-[60%] flex items-center justify-center relative p-8 bg-white dark:bg-slate-900">
+            <div className="h-[60%] w-full relative bg-panda-50 dark:bg-slate-900 flex items-center justify-center overflow-hidden">
                 <div className="relative w-full h-full flex items-center justify-center">
-                    {/* Calligraphy Text */}
-                    <h1 className="text-[100px] md:text-[140px] leading-none text-panda-400 dark:text-panda-300 font-['Great_Vibes'] drop-shadow-sm animate-in fade-in zoom-in duration-1000">
-                        Vyaya
-                    </h1>
+                    {/* Animated Money Background Effect */}
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+                         {[...Array(6)].map((_, i) => (
+                             <div 
+                                key={i} 
+                                className="absolute text-emerald-500 animate-bounce-slow"
+                                style={{
+                                    left: `${Math.random() * 80 + 10}%`,
+                                    top: `${Math.random() * 80 + 10}%`,
+                                    animationDelay: `${i * 0.5}s`,
+                                    fontSize: `${Math.random() * 20 + 20}px`
+                                }}
+                             >
+                                 <Coins size={32} />
+                             </div>
+                         ))}
+                    </div>
+
+                    <img
+                        src="/public/pandamoolah.jpg"
+                        alt="Panda"
+                        className="h-full w-auto max-w-full object-contain drop-shadow-2xl animate-in zoom-in duration-1000"
+                    />
+                    
+                    {/* Overlay Money Bag if using fallback or just for fun effect */}
+                    <div className="absolute top-1/2 left-1/2 transform translate-x-12 -translate-y-12 bg-white/90 backdrop-blur-sm p-3 rounded-2xl shadow-xl animate-bounce border border-emerald-100">
+                        <span className="text-2xl">💰</span>
+                    </div>
                 </div>
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent dark:from-slate-900/40"></div>
             </div>
 
             {/* Bottom Section - 40% */}
-            <div className="h-[40%] bg-white dark:bg-slate-900 w-full rounded-t-[3rem] px-8 pt-10 pb-6 shadow-[0_-10px_60px_-15px_rgba(0,0,0,0.1)] ring-1 ring-black/5 relative z-20 flex flex-col">
+            <div className="h-[40%] bg-white dark:bg-slate-900 w-full rounded-t-[3rem] px-8 pt-10 pb-6 shadow-[0_-10px_60px_-15px_rgba(0,0,0,0.1)] ring-1 ring-black/5 relative z-20 flex flex-col -mt-10">
                 <div className="max-w-md mx-auto w-full flex flex-col h-full">
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-8">Login</h2>
                     
